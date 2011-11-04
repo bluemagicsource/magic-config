@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config-agent>
+
+	<!-- ENABLE PERSISTED PROPERTIES -->
+	<persisted-properties>file:persisted.properties.xml</persisted-properties>
+	
+	<!-- PROPERTY RESOLUTION CHAIN -->
+	<location-chain>
+	
+		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
+		<location uri="classpath:local.properties.xml" />
+		
+		<location uri="resource:bluemagic.properties.xml">
+			<decorate method="prefix">
+				<!-- CHECK HOST SPECIFIC FILE -->
+				<tag class="org.bluemagic.config.decorator.tags.HostnameTag" suffix="." />
+			</decorate>
+		</location>
+		
+		<location keyAsUri="true" user="application" password="secret">
+			<decorate>
+				<!-- CHECK WITH CONFIGURATION SERVICE FOR CURRENT VERSION -->
+				<hashtag>#1.0-SNAPSHOT</hashtag>
+			</decorate>
+			<location-chain>
+				<location>
+					<decorate>
+						<!-- CHECK WITH CONFIGURATION SERVICE FOR HOSTNAME PROPERTY -->
+						<tag prefix="#" class="org.bluemagic.config.decorator.tags.HostnameTag" />
+					</decorate>
+				</location>
+				<location>
+					<decorate>
+						<!-- CHECK WITH CONFIGURATION SERVICE FOR SECURITY PROPERTY-->
+						<hashtag>#confidential</hashtag>
+					</decorate>
+				</location>
+				<location>
+					<decorate>
+						<!-- CHECK WITH CONFIGURATION SERVICE FOR PRODUCTION PROPERTY-->
+						<hashtag>#production</hashtag>
+					</decorate>
+				</location>
+				<location>
+					<decorate>
+						<!-- CHECK WITH CONFIGURATION SERVICE FOR TEST PROPERTY-->
+						<hashtag>#test</hashtag>
+					</decorate>
+				</location>
+			</location-chain>
+		</location>
+		
+		<!-- CHECK FOR PROPERTY IN PERSISTED FILE (LAST DITCH EFFORT) -->
+		<location uri="resource:persisted.properties.xml" />
+		
+	</location-chain>
+	
+</config-agent>

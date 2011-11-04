@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config-agent>
+
+	<!-- PROPERTY RESOLUTION CHAIN -->
+	<location-chain>
+	
+		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
+		<location uri="resource:local.properties.xml" />
+		
+		<!-- SEARCH FOR A BLUEMAGIC PROPERTIES FILE -->
+		<location uri="resource:bluemagic.properties.xml">
+			<location-chain>
+				<location>
+					<decorate method="prefix">
+						<!-- CHECK HOST SPECIFIC FILE -->
+						<tag class="org.bluemagic.config.decorator.tags.HostnameTag" suffix="." />
+					</decorate>
+				</location>
+			</location-chain>
+		</location>
+
+	</location-chain>
+	
+</config-agent>
