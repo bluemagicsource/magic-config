@@ -15,7 +15,7 @@ public class UriUtilsTest {
 		try {
 			input = new URI("https://www.bluemagicsource.org/configuration/project/database/username?systemType=development&appType=json");
 		} catch (Throwable t) {
-			Assert.fail("failed to create uri");
+			Assert.fail("failed to create key");
 		}
 
 		Map<String, String> results = UriUtils.parseUriParameters(input);
@@ -31,7 +31,7 @@ public class UriUtilsTest {
 		try {
 			input = new URI("https://www.bluemagicsource.org/configuration/project/database/username?");
 		} catch (Throwable t) {
-			Assert.fail("failed to create uri");
+			Assert.fail("failed to create key");
 		}
 
 		Map<String, String> results = UriUtils.parseUriParameters(input);

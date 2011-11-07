@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config-agent>
+<magic-config>
 
 	<!-- PROPERTY RESOLUTION CHAIN -->
 	<location-chain>
 	
 		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
-		<location uri="resource:local.properties.xml" />
+		<location uri="local.properties.xml" />
 		
 		<!-- SEARCH FOR A BLUEMAGIC PROPERTIES FILE -->
-		<location uri="resource:bluemagic.properties.xml">
+		<location uri="bluemagic.properties.xml">
 			<location-chain>
 				<location>
 					<decorate method="prefix">
 						<!-- CHECK HOST SPECIFIC FILE -->
-						<tag class="org.bluemagic.config.decorator.tags.HostnameTag" suffix="." />
+						<hostnameTag />
 					</decorate>
 				</location>
 			</location-chain>
@@ -21,4 +21,4 @@
 
 	</location-chain>
 	
-</config-agent>
+</magic-config>

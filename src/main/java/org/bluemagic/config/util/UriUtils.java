@@ -44,7 +44,7 @@ private static final Log LOG = LogFactory.getLog(UriUtils.class);
     }
 
     /**
-     * @param uri - The incoming uri is required (cannot be null) but it does not have
+     * @param key - The incoming key is required (cannot be null) but it does not have
      *              to have query parameters and can have just a question mark.
      * @param queryParameters - Optional and can be null or empty. If values then we
      *              append them according to the order of the map keyset (use comparator
@@ -76,7 +76,7 @@ private static final Log LOG = LogFactory.getLog(UriUtils.class);
 		rval = new URI(uriStr.toString());
 
 	    } catch (Throwable t) {
-		LOG.error("Failed trying to recreate uri<"
+		LOG.error("Failed trying to recreate key<"
 			  + uri.toString()
 			  + "> while removing duplicates and ordering parameters",
 		    t);

@@ -3,12 +3,13 @@ package org.bluemagic.config.location;
 import java.net.URI;
 import java.util.Map;
 
+import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
 
-public class CommandLineLocation extends UriLocation {
+public class CommandLineLocation implements Location {
 
 	/**
-     * @param  uri - URI a unique identifier for a specific instance of data
+     * @param  key - URI a unique identifier for a specific instance of data
      *               or set of data.
      * @param  parameters - Map<ConfigKey name, Object value> name and value pairs
      *                      of data. Note that the Map is required but it may be
@@ -27,16 +28,16 @@ public class CommandLineLocation extends UriLocation {
 	public String get(URI key, Map<MagicKey, Object> parameters) {
 
 		String rval = null;
-		String k = (String) parameters.get(MagicKey.ORIGINAL_URI);
+		String keyAsString = key.toASCIIString();
 
-		if ((k != null) && (!k.trim().isEmpty())) {
+		if ((keyAsString != null) && (!keyAsString.trim().isEmpty())) {
 
 			// We want to check to see if the system property map contains
 			// the key (if it does not contain the key then an override is
 			// not going to occur. There is the case where the override can
 			// be to remove a property (aka the value is empty).
-			if (System.getProperties().containsKey(k)) {
-				rval = System.getProperty(k);
+			if (System.getProperties().containsKey(keyAsString)) {
+				rval = System.getProperty(keyAsString);
 			}
 		}
 		return rval;

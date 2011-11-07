@@ -25,7 +25,7 @@ public class FileSystemTransformer implements Transformer {
 
     
     /***
-     * @param uri Property URI Value(key)
+     * @param key Property URI Value(key)
      * @param parameters Key Value pairs
      * @param data value in the key/value relationship
      */

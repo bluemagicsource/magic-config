@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config-agent>
+<magic-config>
 
 	<!-- ENABLE PERSISTED PROPERTIES -->
-	<persisted-properties>file:persisted.properties.xml</persisted-properties>
+	<persisted-properties>persisted.properties.xml</persisted-properties>
 	
 	<!-- PROPERTY RESOLUTION CHAIN -->
 	<location-chain>
 	
 		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
-		<location uri="classpath:local.properties.xml" />
+		<location uri="local.properties.xml" />
 		
-		<location uri="resource:bluemagic.properties.xml">
+		<location uri="bluemagic.properties.xml">
 			<decorate method="prefix">
 				<!-- CHECK HOST SPECIFIC FILE -->
-				<tag class="org.bluemagic.config.decorator.tags.HostnameTag" suffix="." />
+				<hostnameTag />
 			</decorate>
 		</location>
 		
 		<location class="com.beakbox.core.location.MyLocation" /> 
 		
-		<locationFromKey user="application" password="secret">
+		<remoteLocation user="application" password="secret">
 			<decorate>
 				<!-- CHECK WITH CONFIGURATION SERVICE FOR CURRENT VERSION -->
 				<hashtag>#1.0-SNAPSHOT</hashtag>
@@ -50,11 +50,11 @@
 					</decorate>
 				</location>
 			</location-chain>
-		</locationFromKey>
+		</remoteLocation>
 		
 		<!-- CHECK FOR PROPERTY IN PERSISTED FILE (LAST DITCH EFFORT) -->
-		<location uri="resource:persisted.properties.xml" />
+		<location uri="persisted.properties.xml" />
 		
 	</location-chain>
 	
-</config-agent>
+</magic-config>

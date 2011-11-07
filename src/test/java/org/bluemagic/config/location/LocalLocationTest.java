@@ -14,6 +14,25 @@ import org.junit.Test;
 public class LocalLocationTest {
 
 	@Test
+	public void readFromUriXmlFile() {
+		
+		LocalLocation ll = new LocalLocation();
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		
+		ll.setUri(UriUtils.toUri("testProperties.xml"));
+		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		
+		ll.setUri(UriUtils.toUri("testProperties.xml"));
+		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		
+		ll.setUri(UriUtils.toUri("nested/testProperties.xml"));
+		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		
+		ll.setUri(UriUtils.toUri("nested/testProperties.xml"));
+		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+	}	
+	
+	@Test
 	public void readFromClasspathUriXmlFile() {
 		
 		LocalLocation ll = new LocalLocation();

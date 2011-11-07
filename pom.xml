@@ -62,7 +62,7 @@
 						<Spring-Context>osgi.xml</Spring-Context>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Export-Package>org.bluemagic.config</Export-Package>
-						<Import-Package>org.bluemagic.config.api,!org.apache.commons.logging,!javax.servlet,!org.apache.avalon.framework.logger,!org.apache.log,!org.apache.log4j</Import-Package>
+						<Import-Package>org.bluemagic.config.api,!org.apache.commons.logging,!javax.servlet,!org.apache.avalon.framework.logger,!org.apache.log,!org.apache.log4j,!javax.xml.parsers,!org.w3c.dom,!org.xml.sax</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

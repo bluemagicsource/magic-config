@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config-agent>
+<magic-config>
 
-	<import uri="https://configprops.com/service/%value%.agent.xml" user="application" password="secret">
-
-		<decorate method="template" replace="value">
+	<import uri="https://configprops.com/service/?.agent.xml" user="application" password="secret">
+		<decorate method="placeholder" replace="?">
 			<!-- CHECK WITH CONFIGURATION SERVICE FOR CURRENT VERSION -->
-			<tag class="org.bluemagic.config.decorator.tags.HostnameTag" />
+			<hostnameTag />
 		</decorate>
-				
 	</import>
-
-	<!-- ENABLE PERSISTED PROPERTIES -->
-	<persisted-properties>file:persisted.properties.xml</persisted-properties>
 	
-</config-agent>
+</magic-config>
