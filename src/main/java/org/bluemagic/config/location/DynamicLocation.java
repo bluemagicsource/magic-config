@@ -3,21 +3,21 @@ package org.bluemagic.config.location;
 import java.net.URI;
 import java.util.Map;
 
-import org.bluemagic.config.api.agent.ConfigKey;
-import org.bluemagic.config.api.agent.Location;
+import org.bluemagic.config.api.Location;
+import org.bluemagic.config.api.MagicKey;
 
 public class DynamicLocation implements Location {
 
-	private CommandlineLocation commandlineLocation;
+	private CommandLineLocation commandlineLocation;
 	
 	private LocalLocation localLocation;
 	
 	private RemoteLocation remoteLocation;
 
-	public String get(URI uri, Map<ConfigKey, Object> parameters) {
+	public String get(URI uri, Map<MagicKey, Object> parameters) {
 
 		if (uri.toASCIIString().startsWith("cmd:")) {
-			return commandlineLocation.get(uri, parameters);
+			return getCommandlineLocation().get(uri, parameters);
 			
 		} else if (uri.toASCIIString().startsWith("http")) {
 			return remoteLocation.get(uri, parameters);
@@ -25,6 +25,11 @@ public class DynamicLocation implements Location {
 		} else {
 			return getLocalLocation().get(uri, parameters);
 		}
+	}
+	
+	public boolean supports(URI uri) {
+		
+		return getCommandlineLocation().supports(uri) || localLocation.supports(uri) || remoteLocation.supports(uri);
 	}
 
 	public void setRemoteLocation(RemoteLocation remoteLocation) {
@@ -42,5 +47,13 @@ public class DynamicLocation implements Location {
 
 	public LocalLocation getLocalLocation() {
 		return localLocation;
+	}
+
+	public void setCommandlineLocation(CommandLineLocation commandlineLocation) {
+		this.commandlineLocation = commandlineLocation;
+	}
+
+	public CommandLineLocation getCommandlineLocation() {
+		return commandlineLocation;
 	}
 }

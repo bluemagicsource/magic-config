@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.agent.ConfigKey;
-import org.bluemagic.config.api.agent.Location;
+import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.util.UriUtils;
 import org.bluemagic.config.util.UsernamePasswordAuthenticator;
 
 /**
@@ -22,7 +22,7 @@ import org.bluemagic.config.util.UsernamePasswordAuthenticator;
  * 
  * This class also support username and password authentication.
  **/
-public class RemoteLocation implements Location {
+public class RemoteLocation extends UriLocation {
 	
 	private static final Log LOG = LogFactory.getLog(RemoteLocation.class);
 	
@@ -40,23 +40,29 @@ public class RemoteLocation implements Location {
 	 * 
 	 * @ param searchCriteria - Not used by this implementation.
 	 **/
-	public String get(URI uri, Map<ConfigKey, Object> parameters) {
+	public String get(URI key, Map<MagicKey, Object> parameters) {
 		
+		URL url = null;
 		String rval = null;
-		HttpURLConnection urlConnection = null;
 		BufferedReader urlReader = null;
+		HttpURLConnection urlConnection = null;
 
 		try {
 
 			if ((username != null) && (password != null)) {
-				 Authenticator.setDefault(new
-				 UsernamePasswordAuthenticator(username,
-				 password.toCharArray()));
+				 Authenticator.setDefault(new UsernamePasswordAuthenticator(username, password.toCharArray()));
 			}
-
-			URL url = null;
-			url = uri.toURL();
-
+			// IF URI NOT DEFINED THEN USE KEY AS URI
+			if (this.uri == null) {
+				url = key.toURL();
+			} else {
+				// FALL BACK USING URI + KEY
+				if (this.uri.toASCIIString().endsWith("/")) {
+					url = UriUtils.toUri(this.uri.toASCIIString() + key).toURL();
+				} else {
+					url = UriUtils.toUri(this.uri.toASCIIString() + "/" + key).toURL();
+				}
+			}
 			urlConnection = (HttpURLConnection) url.openConnection();
 			HttpURLConnection.setFollowRedirects(true);
 			urlConnection.setInstanceFollowRedirects(true);
@@ -66,8 +72,7 @@ public class RemoteLocation implements Location {
 			// Read the data out of the stream; we are assuming
 			// that we can do it in one read (otherwise we are
 			// probably timing out and have other problems).
-			urlReader = new BufferedReader(new InputStreamReader(
-					urlConnection.getInputStream()));
+			urlReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
 			String buffer = null;
 			StringBuffer content = new StringBuffer();
@@ -86,32 +91,23 @@ public class RemoteLocation implements Location {
 			// check for a stack or error from the server...
 			int responseCode = urlConnection.getResponseCode();
 			if (responseCode != 200) {
-				throw new RuntimeException("Server displayed a stack trace;\n"
-						+ content.toString());
+				throw new RuntimeException("Server displayed a stack trace;\n" + content.toString());
 			} else if (content.toString().indexOf("java.lang.RuntimeException") > -1) {
-				throw new RuntimeException(
-						"Server displayed a stack trace without setting the responseCode "
-								+ content.toString());
+				throw new RuntimeException("Server displayed a stack trace without setting the responseCode " + content.toString());
 			}
 			rval = content.toString();
 
 			LOG.trace("Found content:" + rval);
 
 		} catch (Throwable t) {
-
-			LOG.trace(
-					"Failed to retrieve data from the server:" + uri.toString(),
-					t);
-
-			throw new RuntimeException(
-					"Failed to retrieve data from the server " + uri, t);
+			LOG.trace("Failed to retrieve data from the server:" + url.toString(), t);
+			throw new RuntimeException("Failed to retrieve data from the server " + url, t);
 
 		} finally {
 
 			if (urlReader != null) {
 				// ResourceManager.close(urlReader);
 			}
-
 			if (urlConnection != null) {
 				try {
 					urlConnection.disconnect();
@@ -120,8 +116,17 @@ public class RemoteLocation implements Location {
 				}
 			}
 		}
-
 		return rval;
+	}
+	
+	public boolean supports(URI key) {
+		
+		boolean supports = true;
+		
+		if (this.uri == null) {
+			supports = key.getScheme().startsWith("http"); 
+		}
+		return supports;
 	}
 	
 	/**

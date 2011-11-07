@@ -5,20 +5,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.bluemagic.config.api.agent.ConfigKey;
-import org.bluemagic.config.api.agent.Decorator;
+import org.bluemagic.config.api.Decorator;
+import org.bluemagic.config.api.MagicKey;
 
 public abstract class TagDecorator implements Decorator {
+	
+	protected String prefixSeperator = ".";
 	
 	protected String replace;
 	
 	private Method method;
 	
-	public Collection<URI> decorate(Collection<URI> uriList, Map<ConfigKey, Object> parameters) {
+	public Collection<URI> decorate(Collection<URI> keyList, Map<MagicKey, Object> parameters) {
 		
 		Collection<URI> decoratedUris = new ArrayList<URI>();
 		
-		for (URI uri : uriList) {
+		for (URI uri : keyList) {
 
 			URI decoratedUri = null;
 			
@@ -41,12 +43,12 @@ public abstract class TagDecorator implements Decorator {
 		return decoratedUris;
 	}
 
-	public abstract URI decorateSuffix(URI uri, Map<ConfigKey, Object> parameters);
+	public abstract URI decoratePrefix(URI key, Map<MagicKey, Object> parameters);
 
-	public abstract URI decoratePlaceholder(URI uri, String replace, Map<ConfigKey, Object> parameters);
+	public abstract URI decoratePlaceholder(URI key, String replace, Map<MagicKey, Object> parameters);
 
-	public abstract URI decoratePrefix(URI uri, Map<ConfigKey, Object> parameters);
-
+	public abstract URI decorateSuffix(URI key, Map<MagicKey, Object> parameters);
+	
 	public void setMethod(Method method) {
 		this.method = method;
 	}
@@ -61,5 +63,13 @@ public abstract class TagDecorator implements Decorator {
 
 	public String getReplace() {
 		return replace;
+	}
+
+	public void setPrefixSeperator(String prefixSeperator) {
+		this.prefixSeperator = prefixSeperator;
+	}
+
+	public String getPrefixSeperator() {
+		return prefixSeperator;
 	}
 }

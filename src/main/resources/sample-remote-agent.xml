@@ -17,7 +17,9 @@
 			</decorate>
 		</location>
 		
-		<location keyAsUri="true" user="application" password="secret">
+		<location class="com.beakbox.core.location.MyLocation" /> 
+		
+		<locationFromKey user="application" password="secret">
 			<decorate>
 				<!-- CHECK WITH CONFIGURATION SERVICE FOR CURRENT VERSION -->
 				<hashtag>#1.0-SNAPSHOT</hashtag>
@@ -26,7 +28,7 @@
 				<location>
 					<decorate>
 						<!-- CHECK WITH CONFIGURATION SERVICE FOR HOSTNAME PROPERTY -->
-						<tag prefix="#" class="org.bluemagic.config.decorator.tags.HostnameTag" />
+						<hostnameTag prefix="#" />
 					</decorate>
 				</location>
 				<location>
@@ -48,7 +50,7 @@
 					</decorate>
 				</location>
 			</location-chain>
-		</location>
+		</locationFromKey>
 		
 		<!-- CHECK FOR PROPERTY IN PERSISTED FILE (LAST DITCH EFFORT) -->
 		<location uri="resource:persisted.properties.xml" />

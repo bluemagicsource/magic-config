@@ -13,8 +13,8 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.agent.ConfigKey;
-import org.bluemagic.config.api.agent.Transformer;
+import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.Transformer;
 
 public class FileSystemTransformer implements Transformer {
     
@@ -29,8 +29,8 @@ public class FileSystemTransformer implements Transformer {
      * @param parameters Key Value pairs
      * @param data value in the key/value relationship
      */
-    public String transform(String data, Map<ConfigKey, Object> parameters) {        
-        storeProperties((URI) parameters.get(ConfigKey.RESOLVED_URI), data);       
+    public String transform(String data, Map<MagicKey, Object> parameters) {        
+        storeProperties((String) parameters.get(MagicKey.ORIGINAL_URI), data);       
         return data;
     }    
     
@@ -38,7 +38,7 @@ public class FileSystemTransformer implements Transformer {
      * @param key property key 
      * @param value property data 
      */
-    private void storeProperties (URI key, String value) {
+    private void storeProperties (String key, String value) {
         Properties fileProperties = new Properties();
         String propertiesFileLoc = "";        
         
@@ -73,7 +73,7 @@ public class FileSystemTransformer implements Transformer {
             }
         }        
 
-        fileProperties.setProperty(key.toASCIIString(), value.toString());
+        fileProperties.setProperty(key, value.toString());
         
         //Saves to an XML formated properties file
         OutputStream xmlProperties = null;        

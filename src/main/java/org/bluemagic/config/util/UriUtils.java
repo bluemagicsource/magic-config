@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -85,7 +86,7 @@ private static final Log LOG = LogFactory.getLog(UriUtils.class);
         return rval;
     }
     
-    public static URI createUriFromString(String uriString) {
+    public static URI toUri(String uriString) {
     	
     	URI uri = null;
     	
@@ -96,6 +97,77 @@ private static final Log LOG = LogFactory.getLog(UriUtils.class);
     		LOG.warn("Unable to create URI from string: " + uriString);
     	}
     	return uri;
+    }
+    
+    public static String[] splitUriAfterScheme(URI uri) {
+    	
+    	String[] split = new String[2]; 
+    	StringBuilder u = new StringBuilder();
+		
+		String scheme = uri.getScheme();
+		if (scheme != null) {
+			u.append(scheme);
+			u.append(":");
+		
+			if (uri.toASCIIString().contains("//")) {					
+				u.append("//");
+			}
+		}
+		split[0] = u.toString();
+
+		if (uri.toASCIIString().contains("//")) {					
+			split[1] = uri.toASCIIString().replaceAll(scheme + "://", "");
+		} else {
+			split[1] = uri.toASCIIString().replaceAll(scheme + ":", "");
+		}
+    	
+    	return split;
+    }
+    
+    public static URI addParameterToUri(URI uri, String key, String value) {
+		
+    	StringBuilder u = new StringBuilder();
+    	TreeMap<String, String> orderedParameters = new TreeMap<String, String>();
+
+		// The tree set naturally orders them and removes the
+		// duplicates by the nature of the map and a tree map
+		// automatically provides order.
+		orderedParameters.putAll(UriUtils.parseUriParameters(uri));
+		orderedParameters.put(key, value); 
+
+		// Finally add the parameters back to a new URI.
+		int indexOf = uri.toASCIIString().indexOf('?');
+		
+		String substring = null;
+		if (!(indexOf < 0)) {
+			substring = uri.toASCIIString().substring(0, indexOf);
+		} else {
+			substring = uri.toASCIIString();
+		}
+		if (orderedParameters.size() > 0) {
+
+			u = new StringBuilder(substring);
+			u.append("?");
+
+			
+			for (String k : orderedParameters.keySet()) {
+
+			    if (!u.toString().endsWith("?")) {
+			    	u.append("&");
+			    }
+		    	u.append(k);
+		    	u.append("=");
+		    	u.append(orderedParameters.get(k));
+		    }
+		} else if (key.toString().endsWith("?")) {
+			// Remove the question mark off of the end... (jerk)
+			u = new StringBuilder(substring);
+	    }
+		try {
+			uri = new URI(u.toString());
+		} catch (Exception e) { }
+		
+		return uri;
     }
 
 	public static URI urlToUri(URL url) {

@@ -1,107 +1,69 @@
 package org.bluemagic.config.decorator;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.bluemagic.config.api.agent.ConfigKey;
-import org.bluemagic.config.api.agent.Tag;
+import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.util.UriUtils;
 
 public class SingleTagDecorator extends TagDecorator {
 
-	private static final String PARAMETER_KEY = "tags";
+	protected String tagParameterKey = "tags";
 	
 	private Tag tag;
 
-	public URI decoratePrefix(URI uri, Map<ConfigKey, Object> parameters) {
+	public URI decoratePrefix(URI key, Map<MagicKey, Object> parameters) {
 		
-		URI decoratedUri = null;
 		StringBuilder u = new StringBuilder();
+		String[] split = UriUtils.splitUriAfterScheme(key);
 		
-		u.append(uri.getScheme());
-		u.append(":");
-		
-		if (uri.toASCIIString().contains("//")) {					
-			u.append("//");
-		}
+		u.append(split[0]);
 		u.append(tag.getValue());
-		u.append(".");
+		u.append(prefixSeperator);
+		u.append(split[1]);
 		
-		if (uri.toASCIIString().contains("//")) {					
-			u.append(uri.toASCIIString().replaceAll(uri.getScheme() + "://", ""));
+		return UriUtils.toUri(u.toString());
+	}
+	
+	public URI decoratePlaceholder(URI key, String replace, Map<MagicKey, Object> parameters) {
+		
+		String uriAsString = "";
+		
+		uriAsString = key.toASCIIString().replace(replace, tag.getValue());
+		
+		return UriUtils.toUri(uriAsString);
+	}
+
+	public URI decorateSuffix(URI key, Map<MagicKey, Object> parameters) {
+
+		Map<String, String> keyParameters = new HashMap<String, String>();
+
+		keyParameters.putAll(UriUtils.parseUriParameters(key));
+		
+		String tagsValue = keyParameters.get(tagParameterKey);
+		if ((tagsValue != null) && (tagsValue.length() > 0)) {
+			tagsValue = tagsValue + "," + tag.getValue();
 		} else {
-			u.append(uri.toASCIIString().replaceAll(uri.getScheme() + ":", ""));
+			tagsValue = tag.getValue();
 		}
-		try {
-			decoratedUri = new URI(u.toString());
-		} catch (Exception e) { }
-		
-		return decoratedUri;
+		return UriUtils.addParameterToUri(key, tagParameterKey, tagsValue);
+	}
+
+	public void setTagParameterKey(String tagParameterKey) {
+		this.tagParameterKey = tagParameterKey;
+	}
+
+	public String getTagParameterKey() {
+		return tagParameterKey;
 	}
 	
-	public URI decoratePlaceholder(URI uri, String replace, Map<ConfigKey, Object> parameters) {
-		
-		URI decoratedUri = null;
-		StringBuilder u = new StringBuilder();
-		
-		u.append(uri.toASCIIString().replaceAll("${" + replace + "}", tag.getValue()));
-		
-		try {
-			decoratedUri = new URI(u.toString());
-		} catch (Exception e) { }
-		
-		return decoratedUri;
-	}
-
-	public URI decorateSuffix(URI uri, Map<ConfigKey, Object> parameters) {
-
-		URI decoratedUri = null;
-		StringBuilder u = new StringBuilder();
-		TreeMap<String, String> orderedParameters = new TreeMap<String, String>();
-
-		// The tree set naturally orders them and removes the
-		// duplicates by the nature of the map and a tree map
-		// automatically provides order.
-		orderedParameters.putAll(UriUtils.parseUriParameters(uri));
-
-		// Finally add the parameters back to a new URI.
-		if (orderedParameters.size() > 0) {
-
-			u = new StringBuilder(uri.toString().substring(0, uri.toString().indexOf('?')));
-			u.append("?");
-
-			if (orderedParameters.containsKey(PARAMETER_KEY)) {
-				orderedParameters.put(PARAMETER_KEY, orderedParameters.get(PARAMETER_KEY) + "," + this.tag.getValue()); 
-			} else {
-				orderedParameters.put(PARAMETER_KEY, this.tag.getValue());
-			}
-			
-			for (String key : orderedParameters.keySet()) {
-
-			    if (!u.toString().endsWith("?")) {
-			    	u.append("&");
-			    }
-		    	u.append(key);
-		    	u.append("=");
-		    	u.append(orderedParameters.get(key));
-		    }
-		} else if (uri.toString().endsWith("?")) {
-			// Remove the question mark off of the end... (jerk)
-			u = new StringBuilder(uri.toString().substring(0, uri.toString().indexOf('?')));
-	    }
-		try {
-			decoratedUri = new URI(u.toString());
-		} catch (Exception e) { }
-		
-		return decoratedUri;
-	}
-	
-	public void setTag(Tag tag) {
-		this.tag = tag;
-	}
-
 	public Tag getTag() {
 		return tag;
+	}
+
+	public void setTag(Tag tag) {
+		this.tag = tag;
 	}
 }

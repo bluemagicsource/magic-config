@@ -9,79 +9,51 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.agent.ConfigKey;
+import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.util.DataNotFoundException;
 import org.bluemagic.config.util.UriUtils;
 
 /**
- * The classpath data supplier is expecting a location in the format of
- * classpath://[filename]?name=propname&type=json or it may also start with
- * "resource://", "classpath:", or "resource:" (the params are an optional way
- * of asking for a value (supported by another nested url data supplier).
+ *
+ *
  **/
 public class LocalLocation extends UriLocation {
 
 	private static final Log LOG = LogFactory.getLog(LocalLocation.class);
 
 	/**
-	 * Uses the location and optional search criteria to locate the data and
-	 * return it.
 	 * 
-	 * @param uri
-	 *            - Any URI value that tells the Configuration Management
-	 *            implementation where to find the data. Some examples include
-	 *            but are not limited to: classpath://[resource
-	 *            name]?name=[property name]&type=[JSON|XML|TXT] file://[file
-	 *            name]?name=[property name]&type=[JSON|XML|TXT] file://[file
-	 *            name]?name=[property name]&type=[JSON|XML|TXT]
-	 *            resource://[file name]?name=[property
-	 *            name]&type=[JSON|XML|TXT] (note a resource can be found in
-	 *            either a file or classpath)
-	 *            https://www.svn.org/svn/repos/trunk
-	 *            /conf/a.properties?name=prop&type=JSON Note that all
-	 *            parameters (name and value pairs at the end of the URI) are
-	 *            automatically added to the parameter map (second input
-	 *            argument) If missing then we automatically create this map and
-	 *            pass it along based on this contract.
 	 * 
-	 *            @ param parameterMap - Map<Name, Value> Generic method for
-	 *            passing any data along such as search criteria that will be
-	 *            used by subsequent implementations. Note that any name value
-	 *            pairs from the URI are automatically added to this map.
-	 * 
-	 *            @ return InputStream - open to the file.
-	 **/
-	public String get(URI uri, Map<ConfigKey, Object> parameters) {
+	 */
+	public String get(URI key, Map<MagicKey, Object> parameters) {
 
 		File file = null;
 		String value = null;
-
-		String key;
+		boolean useKeyAsUri = false;
 		Properties properties = new Properties();
+		String keyAsString = key.toASCIIString();
 
+		// IF URI IS NULL USE INCOMING KEY AS URI
+		if (this.uri == null) {
+			useKeyAsUri = true;
+			this.uri = UriUtils.toUri(keyAsString.substring(0, keyAsString.lastIndexOf("/")));
+			keyAsString = keyAsString.substring(keyAsString.lastIndexOf("/") + 1, keyAsString.length());
+		}
+		
 		// CREATE THE FILE PATH
 		try {
 			// FILE ON THE SYSTEM
 			if ("file".equals(this.uri.getScheme())) {
-
-				URI fileUri = UriUtils.createUriFromString(this.uri.toASCIIString().replaceAll(this.uri.getScheme(), "file"));
-				file = new File(fileUri);
+				file = new File(this.uri);
 
 			} else {
 				// FILE ON THE CLASSPATH
-				URL url = this.getClass()
-						.getClassLoader().getResource(this.uri.getAuthority());
+				String schemeSpecificPart = this.uri.getSchemeSpecificPart().replace("//", "");
+				URL url = this.getClass().getClassLoader().getResource(schemeSpecificPart);
 				file = new File(UriUtils.urlToUri(url));
 			}
-			// XML FILE
-			if (this.uri.toASCIIString().endsWith(".xml")) {
-				properties.loadFromXML(new FileInputStream(file));
-			} else {
-				// STANDARD PROPERTIES FILE
-				properties.load(new FileInputStream(file));
-			}
-			// GRAB THE KEY
-			key = uri.toASCIIString();
+			//LOAD PROPERTIES FROM FILE
+			properties = loadPropertiesFromFile(file);
 
 		} catch (Throwable t) {
 			if (LOG.isTraceEnabled()) {
@@ -91,29 +63,50 @@ public class LocalLocation extends UriLocation {
 			}
 			throw new RuntimeException(t);
 		}
-
 		if (LOG.isTraceEnabled()) {
-			LOG.trace("Searching for property:" + key);
+			LOG.trace("Searching for property:" + keyAsString);
 		}
-		value = properties.getProperty(key);
+		// GET THE PROPERTY
+		value = properties.getProperty(keyAsString);
 
 		// IF WE GOT A VALUE, TRIM THE WHITESPACE
 		if (value != null) {
 			value = value.trim();
 		}
-
-		if (LOG.isTraceEnabled()) {
-			LOG.trace(properties);
-		} else if (LOG.isTraceEnabled()) {
-			LOG.debug("Value:" + value);
-		}
-
 		if (value == null) {
 			throw new DataNotFoundException();
+			
 		} else if (LOG.isTraceEnabled()) {
-			LOG.trace("Found Property for URI:" + uri + " at "
-					+ this.uri.toString() + "value of" + value);
+			LOG.trace("Found Property for URI:" + key + " at " + this.uri.toString() + " value of " + value);
+		}
+		// QUICK CHECK TO RESET URI IF IT WAS DYNAMIC
+		if (useKeyAsUri) {
+			this.uri = null;
 		}
 		return value;
+	}
+
+	private Properties loadPropertiesFromFile(File file) throws Exception {
+
+		Properties properties = new Properties();
+		
+		// XML FILE
+		if (this.uri.toASCIIString().endsWith(".xml")) {
+			properties.loadFromXML(new FileInputStream(file));
+		} else {
+			// STANDARD PROPERTIES FILE
+			properties.load(new FileInputStream(file));
+		}
+		return properties;
+	}
+
+	public boolean supports(URI uri) {
+		
+		boolean supports = true;
+		
+		if (this.uri == null) {
+			supports = "file".equals(uri.getScheme()) || "classpath".equals(uri.getScheme());
+		} 
+		return supports;
 	}
 }

@@ -8,15 +8,14 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.agent.ConfigKey;
-import org.bluemagic.config.api.agent.Location;
+import org.bluemagic.config.api.Location;
+import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.util.DataNotFoundException;
-import org.bluemagic.config.util.LocationBuilder;
 import org.bluemagic.config.util.UriUtils;
 
 /**
  * The Default Configuration Agent class is the entry point where all external
- * processes and programs arrive to retreive their configuration settings via
+ * processes and programs arrive to retrieve their configuration settings via
  * the hierarchical algorithms configured for their client. Note that the client
  * can be custom configured for almost any algorithm.
  * 
@@ -33,71 +32,123 @@ import org.bluemagic.config.util.UriUtils;
  * debug and includes stack traces.
  * 
  **/
-public class BluemagicProperties extends Properties {
+public class BlueMagicProperties extends Properties {
 	
 	private static final long serialVersionUID = -2208105007603310712L;
 	
-	private static final Log LOG = LogFactory.getLog(BluemagicProperties.class);
-	
-	private String uriPrefix = "";
+	private static final Log LOG = LogFactory.getLog(BlueMagicProperties.class);
 
+	private Collection<Location> configLocations;
+	
 	private Collection<Location> agentLocations;
 	
-	private Collection<Location> configLocations;
+	private String keyPrefix = "";
+
+	// SET TO FALSE FOR NOW, BUT IS CONFIGURABLE
+	private boolean autoInitialize = false;
+
+	// STOPS NAGGING ABOUT INITIALIZATION
+	private boolean hasBeenWarned = false;
 	
 	public void init() {
 		if (configLocations == null) {
-			configLocations = LocationBuilder.buildConfigLocations(agentLocations);
+			//configLocations = LocationBuilder.buildConfigLocations(agentLocations);
 		}
 	}
 
 	public synchronized Object get(Object key) {
-		return getProperty((String) key);
+		
+		Object value = null;
+		
+		// IF URI WAS PASSED IN, CONVERT IT TO STRING
+		// BEING NICE AND FRIENDLY
+		if (key instanceof URI) {
+			key = ((URI) key).toASCIIString();
+			
+		}
+		// ONLY STRING KEYS ARE SUPPORTED AT THIS TIME
+		if (!(key instanceof String)) {
+			
+			String message = "Only java.util.String key values are supported at this time.";
+			LOG.error(message);
+			throw new RuntimeException(message);
+		} else {
+			// GET THE VALUE SINCE IT IS A STRING
+			value = getProperty(key.toString()); 
+		}
+		return value;
 	}
 	
-	public String getProperty(String key) {
+	public String getProperty(String keyAsString) {
 		
-		Map<ConfigKey, Object> parameters = new HashMap<ConfigKey, Object>();
-		URI uri = UriUtils.createUriFromString(uriPrefix + key);
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		URI key = UriUtils.toUri(getKeyPrefix() + keyAsString);
 
-		return getMagic(uri, parameters);
+		return getMagic(key, parameters);
 	}
 	
-	public String getProperty(String key, String defaultValue) {
+	public String getProperty(String keyAsString, String defaultValue) {
 		
-		Map<ConfigKey, Object> parameters = new HashMap<ConfigKey, Object>();
-		URI uri = UriUtils.createUriFromString(uriPrefix + key);
-		parameters.put(ConfigKey.DEFAULT_VALUE, defaultValue);
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		URI key = UriUtils.toUri(getKeyPrefix() + keyAsString);
+		parameters.put(MagicKey.DEFAULT_VALUE, defaultValue);
 		
-		return getMagic(uri, parameters);
+		return getMagic(key, parameters);
 	}
 	
-	public String getMagic(URI uri, Map<ConfigKey, Object> parameters) {
+	public String getMagic(URI key, Map<MagicKey, Object> parameters) {
 		
 		String value = null;
 		
-		if (configLocations == null) {
-			LOG.warn("BluemagicProperties was not initialized, please use init() method.");
-			init();
-		}
-
-		if (parameters == null) {
-			parameters = new HashMap<ConfigKey, Object>();
-		}
-		parameters.put(ConfigKey.ORIGINAL_URI, uri);
+		// CHECK TO SEE IF INITIALIZED
+		initializeCheck();
 		
-		for (Location location : configLocations) {
-			
-			try {
-				value = location.get(uri, parameters);
-			} catch (DataNotFoundException dnfe) {
-				dnfe.printStackTrace();
+		// IF NO PARAMETERS PASSED IN PREP IT FOR MAGIC FRAMEWORK
+		// DONT FORGET TO ADD IN THE ORIGINAL URI TO THE PARAMS
+		if (parameters == null) {
+			parameters = new HashMap<MagicKey, Object>();
+		}
+		parameters.put(MagicKey.ORIGINAL_URI, key);
+		
+		// THE CORE PART THAT CHECKS EACH LOCATION FOR PROPERTIES
+		if (configLocations != null) {
+			for (Location location : configLocations) {
+				
+				try {
+					if (location.supports(key)) {
+						value = location.get(key, parameters);
+					}
+				} catch (DataNotFoundException dnfe) {
+					dnfe.printStackTrace();
+				}
 			}
 		}
+		// CHECK THE DEFAULT VALUE, IF ONE PROVIDED
 		if (value == null) {
-			value = (String) parameters.get(ConfigKey.DEFAULT_VALUE);
+			value = (String) parameters.get(MagicKey.DEFAULT_VALUE);
+		} else {
+			LOG.debug("Found property: " + key + " at location: " + parameters.get(MagicKey.RESOLVED_URI));
+		}
+		// CHECK WITH PARENT PROPERTIES TO SEE IF SOMEONE ADDED IT
+		if (value == null) {
+			Object ret = super.get(key.toASCIIString());
+			if (ret != null) {
+				value = ret.toString();
+			}
 		}
 		return value;
+	}
+
+	private void initializeCheck() {
+		
+		if ((configLocations == null) && (!hasBeenWarned)) {
+			LOG.warn("BluemagicProperties was not initialized, please use init() method.");
+			hasBeenWarned = true;
+			
+			if (isAutoInitialize()) {
+				init();
+			}
+		}
 	}
 
 	public void setAgentLocations(Collection<Location> agentLocations) {
@@ -116,11 +167,19 @@ public class BluemagicProperties extends Properties {
 		return configLocations;
 	}
 
-	public void setUriPrefix(String uriPrefix) {
-		this.uriPrefix = uriPrefix;
+	public void setKeyPrefix(String keyPrefix) {
+		this.keyPrefix = keyPrefix;
 	}
 
-	public String getUriPrefix() {
-		return uriPrefix;
+	public String getKeyPrefix() {
+		return keyPrefix;
+	}
+
+	public void setAutoInitialize(boolean autoInitialize) {
+		this.autoInitialize = autoInitialize;
+	}
+
+	public boolean isAutoInitialize() {
+		return autoInitialize;
 	}
 }
