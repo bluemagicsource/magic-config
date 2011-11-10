@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<magic-config>
+
+	<!-- PROPERTY RESOLUTION CHAIN -->
+	<list>
+	
+		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
+		<localLocation uri="local.properties.xml" />
+		
+		<!-- SEARCH FOR A BLUEMAGIC PROPERTIES FILE -->
+		<localLocation uri="testProperties.xml">
+			<list>
+				<location>
+					<decorator method="prefix">
+						<!-- CHECK HOST SPECIFIC FILE -->
+						<hostnameTag />
+					</decorator>
+				</location>
+			</list>
+		</localLocation>
+
+	</list>
+	
+</magic-config>
