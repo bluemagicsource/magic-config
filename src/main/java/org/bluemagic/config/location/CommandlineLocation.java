@@ -8,6 +8,10 @@ import org.bluemagic.config.api.MagicKey;
 
 public class CommandLineLocation implements Location {
 
+	public String locate(URI key, Map<MagicKey, Object> parameters) {
+		return get(key, parameters);
+	}
+	
 	/**
      * @param  key - URI a unique identifier for a specific instance of data
      *               or set of data.
@@ -44,6 +48,6 @@ public class CommandLineLocation implements Location {
 	}
 	
 	public boolean supports(URI key) {
-		return "cmd".equals(key.getScheme());
+		return true;
 	}
 }

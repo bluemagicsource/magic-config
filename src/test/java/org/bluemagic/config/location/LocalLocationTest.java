@@ -113,4 +113,13 @@ public class LocalLocationTest {
 		assertTrue(ll.supports(UriUtils.toUri("http://abc.xml")));
 		assertTrue(ll.supports(UriUtils.toUri("https://abc.xml")));
 	}
+	
+	@Test
+	public void readFromFile() {
+		
+		LocalLocation ll = new LocalLocation();
+		
+		String string = ll.get(UriUtils.toUri("test.properties"), new HashMap<MagicKey,Object>());
+		assertEquals("abc=123", string.trim());
+	}
 }

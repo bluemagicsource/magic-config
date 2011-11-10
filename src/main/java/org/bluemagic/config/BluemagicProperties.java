@@ -1,6 +1,7 @@
 package org.bluemagic.config;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.factory.ConfigXmlParser;
+import org.bluemagic.config.factory.DecoratorFactory;
+import org.bluemagic.config.factory.LocationFactory;
+import org.bluemagic.config.factory.TagFactory;
+import org.bluemagic.config.factory.TransformerFactory;
+import org.bluemagic.config.location.LocalLocation;
 import org.bluemagic.config.util.DataNotFoundException;
 import org.bluemagic.config.util.UriUtils;
 
@@ -37,22 +44,47 @@ public class BlueMagicProperties extends Properties {
 	private static final long serialVersionUID = -2208105007603310712L;
 	
 	private static final Log LOG = LogFactory.getLog(BlueMagicProperties.class);
-
+	
+	private String magicConfigFile = "magic-config.xml";
+	
+	private Collection<Location> magicConfigLocations;
+	
 	private Collection<Location> configLocations;
 	
-	private Collection<Location> agentLocations;
+	private ConfigXmlParser xmlParser;
 	
 	private String keyPrefix = "";
 
-	// SET TO FALSE FOR NOW, BUT IS CONFIGURABLE
-	private boolean autoInitialize = false;
+	// SET TO TRUE FOR NOW, BUT IS CONFIGURABLE
+	private boolean autoInitialize = true;
 
 	// STOPS NAGGING ABOUT INITIALIZATION
 	private boolean hasBeenWarned = false;
 	
+	public BlueMagicProperties() { }
+	
+	public BlueMagicProperties(String magicConfigFile) {
+		this.magicConfigFile = magicConfigFile;
+	}
+	
 	public void init() {
 		if (configLocations == null) {
-			//configLocations = LocationBuilder.buildConfigLocations(agentLocations);
+			
+			// DEFAULT TO MAGIC-CONFIG FILE
+			if (magicConfigLocations == null) {
+				magicConfigLocations = new ArrayList<Location>();
+				magicConfigLocations.add(new LocalLocation(getMagicConfigFile()));
+			}
+			// BAREBONES INITIALIZATION
+			if (xmlParser == null) {
+				xmlParser = new ConfigXmlParser();
+				xmlParser.setDecoratorFactory(new DecoratorFactory());
+				xmlParser.setLocationFactory(new LocationFactory());
+				xmlParser.setTagFactory(new TagFactory());
+				xmlParser.setTransformerFactory(new TransformerFactory());
+			}
+			// BUILD THE CONFIG LOCATIONS FROM THE MAGIC-CONFIG
+			configLocations = xmlParser.buildLocations(magicConfigLocations);
 		}
 	}
 
@@ -116,7 +148,12 @@ public class BlueMagicProperties extends Properties {
 				
 				try {
 					if (location.supports(key)) {
-						value = location.get(key, parameters);
+						value = location.locate(key, parameters);
+						
+						// CHECK TO SEE IF WE FOUND A VALUE
+						if (value != null) {
+							break;
+						}
 					}
 				} catch (DataNotFoundException dnfe) {
 					dnfe.printStackTrace();
@@ -152,11 +189,11 @@ public class BlueMagicProperties extends Properties {
 	}
 
 	public void setAgentLocations(Collection<Location> agentLocations) {
-		this.agentLocations = agentLocations;
+		this.magicConfigLocations = agentLocations;
 	}
 
 	public Collection<Location> getAgentLocations() {
-		return agentLocations;
+		return magicConfigLocations;
 	}
 
 	public void setConfigLocations(Collection<Location> configLocations) {
@@ -181,5 +218,29 @@ public class BlueMagicProperties extends Properties {
 
 	public boolean isAutoInitialize() {
 		return autoInitialize;
+	}
+
+	public Collection<Location> getMagicConfigLocations() {
+		return magicConfigLocations;
+	}
+
+	public void setMagicConfigLocations(Collection<Location> magicConfigLocations) {
+		this.magicConfigLocations = magicConfigLocations;
+	}
+
+	public ConfigXmlParser getXmlParser() {
+		return xmlParser;
+	}
+
+	public void setXmlParser(ConfigXmlParser xmlParser) {
+		this.xmlParser = xmlParser;
+	}
+
+	public void setMagicConfigFile(String magicConfigFile) {
+		this.magicConfigFile = magicConfigFile;
+	}
+
+	public String getMagicConfigFile() {
+		return magicConfigFile;
 	}
 }

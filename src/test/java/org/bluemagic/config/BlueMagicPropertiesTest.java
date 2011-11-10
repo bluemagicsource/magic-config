@@ -44,4 +44,12 @@ public class BlueMagicPropertiesTest {
 		bmp.put("jackster:rodr/hokey", "yamble");
 		assertEquals("yamble", bmp.getProperty("hokey"));
 	}
+	
+	@Test
+	public void loadCannedProperties() {
+		
+		BlueMagicProperties bmp = new BlueMagicProperties("sample-magic-config.xml");
+		Object foo = bmp.get("foo");
+		System.out.println("\n\nfoo=" + foo.toString());
+	}
 }

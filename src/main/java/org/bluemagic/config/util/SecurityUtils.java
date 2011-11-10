@@ -3,7 +3,8 @@ package org.bluemagic.config.util;
 import java.math.BigInteger;
 
 public class SecurityUtils {
-    public static String show (String data) {
+    
+	public static String show (String data) {
         if (data != null) {
             BigInteger tempData = new BigInteger(data, 13);          
            

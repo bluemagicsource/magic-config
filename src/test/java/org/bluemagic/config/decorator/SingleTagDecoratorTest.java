@@ -29,6 +29,21 @@ public class SingleTagDecoratorTest {
 	}
 	
 	@Test
+	public void simpleDecoratePrefix2() {
+		
+		SingleTag singleTag = new SingleTag();
+		singleTag.setValue("myTag");
+		
+		SingleTagDecorator std = new SingleTagDecorator();
+		std.setTag(singleTag);
+		
+		URI key = UriUtils.toUri("abc");
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		
+		assertEquals("myTag.abc", std.decoratePrefix(key, parameters).toASCIIString());
+	}
+	
+	@Test
 	public void simpleDecoratePlaceholder() {
 		
 		SingleTag singleTag = new SingleTag();
