@@ -3,12 +3,13 @@ package org.bluemagic.config.location;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.util.UriUtils;
 
 public abstract class UriLocation implements Location {
 	
@@ -18,17 +19,18 @@ public abstract class UriLocation implements Location {
 	
 	public String locate(URI key, Map<MagicKey, Object> parameters) {
 		
+		URI originalUri = this.uri;
 		String result = null;
-		Collection<URI> keyList = new ArrayList<URI>();
 		Collection<URI> decorated = new ArrayList<URI>();
-		keyList.add(this.uri);
+		decorated.add(this.uri);
 		
-		for (Decorator decorator : decorators) {
-			decorated.addAll(decorator.decorate(keyList, parameters));
+		List<Decorator> reversedDecorators = new ArrayList<Decorator>(decorators);
+		Collections.reverse(reversedDecorators);
+		
+		for (Decorator decorator : reversedDecorators) {
+			decorated = decorator.decorate(decorated, parameters);
 		}
-		if (decorated.size() == 0) {
-			decorated.add(this.uri);
-		}
+		
 		for (URI uri : decorated) {
 			this.uri = uri;
 			result = get(key, parameters);
@@ -37,6 +39,7 @@ public abstract class UriLocation implements Location {
 				break;
 			}
 		}
+		this.uri = originalUri;
 		return result;
 	}
 	

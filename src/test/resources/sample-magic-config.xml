@@ -5,11 +5,20 @@
 	<list>
 	
 		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
+		<commandLineLocation />
+		
+		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
 		<localLocation uri="local.properties.xml" />
 		
 		<!-- SEARCH FOR A BLUEMAGIC PROPERTIES FILE -->
 		<localLocation uri="testProperties.xml">
 			<list>
+				<location>
+					<decorator method="prefix">
+						<!-- CHECK ABC SPECIFIC FILE -->
+						<singleTag>abc</singleTag>
+					</decorator>
+				</location>
 				<location>
 					<decorator method="prefix">
 						<!-- CHECK HOST SPECIFIC FILE -->
@@ -18,6 +27,7 @@
 				</location>
 			</list>
 		</localLocation>
+		
 
 	</list>
 	

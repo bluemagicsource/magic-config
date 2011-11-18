@@ -1,18 +1,16 @@
 package org.bluemagic.config.location;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.util.RestUtils;
 import org.bluemagic.config.util.UriUtils;
-import org.bluemagic.config.util.UsernamePasswordAuthenticator;
 
 /**
  * the URL data supplier attempts to read any url and return all of the data
@@ -26,9 +24,9 @@ public class RemoteLocation extends UriLocation {
 	
 	private static final Log LOG = LogFactory.getLog(RemoteLocation.class);
 	
-	private String username = null;
+	private static Map<URI, Set<String>> prefetched;
 	
-	private String password = null;
+	private boolean prefetch = false;
 	
 	/**
 	 * Uses the location and optional search criteria to locate the data and
@@ -42,112 +40,73 @@ public class RemoteLocation extends UriLocation {
 	 **/
 	public String get(URI key, Map<MagicKey, Object> parameters) {
 		
-		URL url = null;
-		String rval = null;
-		BufferedReader urlReader = null;
-		HttpURLConnection urlConnection = null;
-
-		try {
-
-			if ((username != null) && (password != null)) {
-				 Authenticator.setDefault(new UsernamePasswordAuthenticator(username, password.toCharArray()));
-			}
-			// IF URI NOT DEFINED THEN USE KEY AS URI
-			if (this.uri == null) {
-				url = key.toURL();
+		if (prefetch) {
+			
+			// CHECK TO SEE IF URI WAS ALREADY PREFETCHED
+			URI originalUri = (URI) parameters.get(MagicKey.ORIGINAL_URI);
+			Set<String> discovered = prefetched.get(originalUri);
+			if (discovered == null) {
+				// NO IT WASN'T SO GO AND PREFETCH THE KEY
+				prefetched.put(key, searchForKeys(originalUri));
+				
 			} else {
-				// FALL BACK USING URI + KEY
-				if (this.uri.toASCIIString().endsWith("/")) {
-					url = UriUtils.toUri(this.uri.toASCIIString() + key).toURL();
+				if (!(discovered.contains(key.toASCIIString()))) {
+					// NO HIT IN PREFETCHED KEYS
+					LOG.debug("Key: " + key.toASCIIString() + " not found in prefetched keys!");
+					return null;
+					
 				} else {
-					url = UriUtils.toUri(this.uri.toASCIIString() + "/" + key).toURL();
-				}
-			}
-			urlConnection = (HttpURLConnection) url.openConnection();
-			HttpURLConnection.setFollowRedirects(true);
-			urlConnection.setInstanceFollowRedirects(true);
-			urlConnection.setAllowUserInteraction(false);
-			urlConnection.connect();
-
-			// Read the data out of the stream; we are assuming
-			// that we can do it in one read (otherwise we are
-			// probably timing out and have other problems).
-			urlReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-
-			String buffer = null;
-			StringBuffer content = new StringBuffer();
-
-			while ((buffer = urlReader.readLine()) != null) {
-
-				// Append a newline if we are past the second line and the new
-				// buffer
-				// is not empty.
-				if ((content.length() > 0) && (buffer.length() > 0)) {
-					content.append("\n"); // it trims the newline character
-				}
-				content.append(buffer);
-			}
-
-			// check for a stack or error from the server...
-			int responseCode = urlConnection.getResponseCode();
-			if (responseCode != 200) {
-				throw new RuntimeException("Server displayed a stack trace;\n" + content.toString());
-			} else if (content.toString().indexOf("java.lang.RuntimeException") > -1) {
-				throw new RuntimeException("Server displayed a stack trace without setting the responseCode " + content.toString());
-			}
-			rval = content.toString();
-
-			LOG.trace("Found content:" + rval);
-
-		} catch (Throwable t) {
-			LOG.trace("Failed to retrieve data from the server:" + url.toString(), t);
-			throw new RuntimeException("Failed to retrieve data from the server " + url, t);
-
-		} finally {
-
-			if (urlReader != null) {
-				// ResourceManager.close(urlReader);
-			}
-			if (urlConnection != null) {
-				try {
-					urlConnection.disconnect();
-				} catch (Throwable t1) {
-					// do nothing we are simply trying to close
+					// DO NOTHING SINCE KEY WAS DISCOVERED
+					LOG.debug("Prefetch hit for: " + key.toASCIIString());
 				}
 			}
 		}
-		return rval;
+		URI propertyUri = key;
+
+		// IF URI NOT DEFINED THEN USE KEY AS URI
+		if (this.uri != null) {
+			
+			// FALL BACK USING URI + KEY
+			if (this.uri.toASCIIString().endsWith("/")) {
+				propertyUri = UriUtils.toUri(this.uri.toASCIIString() + key);
+			} else {
+				propertyUri = UriUtils.toUri(this.uri.toASCIIString() + "/" + key);
+			}
+		}
+		return RestUtils.get(propertyUri);
 	}
 	
+	public Set<String> searchForKeys(URI baseUri) {
+
+		Set<String> keySet = new HashSet<String>();
+		String searchResults = RestUtils.get(baseUri);
+		String[] split = searchResults.split("\n");
+		
+		for (String uriAsString : split) {
+			keySet.add(uriAsString);
+		}
+		return keySet;
+	}
+
 	public boolean supports(URI key) {
 		
 		boolean supports = true;
 		
 		if (this.uri == null) {
-			supports = key.getScheme().startsWith("http"); 
+			supports = "http".equals(key.getScheme()); 
 		}
 		return supports;
 	}
-	
-	/**
-	 * Optional, username for authentication with the subversion server.
-	 * 
-	 * @param username
-	 *            - String, when null we assume no authentication (or an
-	 *            alternative implementation will be supplied)
-	 **/
-	public void setUsername(String username) {
-		this.username = username;
+
+	public void setPrefetch(boolean prefetch) {
+		
+		if ((prefetch) && (prefetched == null)){
+			prefetched = new HashMap<URI, Set<String>>();
+		}
+		this.prefetch = prefetch;
 	}
 
-	/**
-	 * Optional, password for authentication withe subversion server
-	 * 
-	 * @param password
-	 *            - String, when null we assume no authentication (or an
-	 *            alternative implementation will be supplied).
-	 **/
-	public void setPassword(String password) {
-		this.password = password;
+	public boolean isPrefetch() {
+		return prefetch;
 	}
 }

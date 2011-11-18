@@ -14,6 +14,6 @@ public class HostnameTag extends SingleTag {
 				throw new RuntimeException(t);
 			}
 		}
-		return value;
+		return prefix + value + suffix;
 	}
 }

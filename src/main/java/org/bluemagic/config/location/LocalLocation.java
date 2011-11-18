@@ -13,7 +13,6 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.util.DataNotFoundException;
 import org.bluemagic.config.util.UriUtils;
 
 /**

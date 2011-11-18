@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.HashMap;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -48,8 +49,11 @@ public class BlueMagicPropertiesTest {
 	@Test
 	public void loadCannedProperties() {
 		
-		BlueMagicProperties bmp = new BlueMagicProperties("sample-magic-config.xml");
+		Properties bmp = new BlueMagicProperties("sample-magic-config.xml");
 		Object foo = bmp.get("foo");
 		System.out.println("\n\nfoo=" + foo.toString());
+		
+		//foo = bmp.get("fu");
+		//System.out.println("fu=" + foo.toString());
 	}
 }

@@ -1,5 +1,13 @@
 package org.bluemagic.config.decorator.tags;
 
+/**
+ * This is the Java representation of a tripletag or a machinetag
+ * It can be used to describe enhanced tagging information
+ * 
+ * For example geo:latitude=83.3 where "geo" is the namespace, "latitude"
+ * id the predicate and "83.3" is the value
+ *
+ */
 public class TripleTag extends SingleTag {
 
 	private String namespace;
@@ -12,6 +20,48 @@ public class TripleTag extends SingleTag {
 		this.namespace = namespace;
 		this.predicate = predicate;
 		this.value = value;
+	}
+	
+	public TripleTag(String namespace, String predicate, String valuePrefix, String value, String valueSuffix) {
+		
+		this.namespace = namespace;
+		this.predicate = predicate;
+		
+		setPrefix(valuePrefix);
+		this.value = value;
+		setSuffix(valueSuffix);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	
+		boolean equals = false;
+		
+		if (obj instanceof TripleTag) {
+			TripleTag other = (TripleTag) obj;
+			
+			String otherNamespace = other.getNamespace();
+			String otherPredicate = other.getPredicate();
+			String otherValue = other.getValue();
+			
+			if (otherNamespace.equals(this.getNamespace()) && otherPredicate.equals(this.getPredicate()) && otherValue.equals(this.getValue())) {
+				equals = true;
+			}
+		}
+		return equals;
+	}
+	
+	@Override
+	public String toString() {
+		
+		StringBuilder b = new StringBuilder();
+		b.append(this.namespace);
+		b.append(":");
+		b.append(this.predicate);
+		b.append("=");
+		b.append(getValue());
+
+		return b.toString();
 	}
 	
 	public void setPredicate(String predicate) {

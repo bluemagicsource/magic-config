@@ -2,6 +2,7 @@ package org.bluemagic.config.factory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,9 @@ import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.Tag;
+import org.bluemagic.config.decorator.tags.DoubleTag;
+import org.bluemagic.config.decorator.tags.SingleTag;
+import org.bluemagic.config.decorator.tags.TripleTag;
 import org.bluemagic.config.location.ChildUriLocation;
 import org.bluemagic.config.location.LocalLocation;
 import org.bluemagic.config.location.UriLocation;
@@ -23,6 +27,7 @@ import org.bluemagic.config.util.StringUtils;
 import org.bluemagic.config.util.UriUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -49,7 +54,10 @@ public class ConfigXmlParser {
 				URI key = local.getUri();
 				local.setUri(null);
 				String xml = local.get(key, new HashMap<MagicKey, Object>());
-				return parse(xml);
+				
+				if ((xml != null) && (!xml.isEmpty())) {
+					return parse(xml);
+				}
 			}
 		}
 		return null;
@@ -134,34 +142,31 @@ public class ConfigXmlParser {
 		Collection<Decorator> decorators = new ArrayList<Decorator>();
 		Collection<Location> locations = new ArrayList<Location>();
 		
-		// CUSTOM LOCATION
-		Node customLocationNode = n.getAttributes().getNamedItem("class");
-		if (customLocationNode != null) {
-			String className = customLocationNode.getNodeValue();
-			rootLocation = locationFactory.build(className);
+		
+		// REGULAR LOCATION
+		String nodeName = n.getNodeName();
+		
+		if ("location".equals(nodeName)) {
+			nodeName = "childUriLocation";
+		}
+		String className = nodeName;
+		if (!className.contains(".")) {
+			className = LocationFactory.DEFAULT_LOCATION_PACKAGE_PREFIX + StringUtils.capitalize(className); 
+		}
+		rootLocation = locationFactory.build(className);
+		
+		if (rootLocation instanceof UriLocation) {
 			
-		} else {
-			// REGULAR LOCATION
-			String nodeName = n.getNodeName();
+			UriLocation uriLocation = (UriLocation) rootLocation;
+			String uriAsString = null;
+			Node uriNode = n.getAttributes().getNamedItem("uri");
 			
-			if ("location".equals(nodeName)) {
-				nodeName = "childUriLocation";
+			if (uriNode != null) {
+				uriAsString = uriNode.getNodeValue();
+				URI uri = UriUtils.toUri(uriAsString);
+				uriLocation.setUri(uri);
 			}
-			rootLocation = locationFactory.build(LocationFactory.DEFAULT_LOCATION_PACKAGE_PREFIX + StringUtils.capitalize(nodeName));
-			
-			if (rootLocation instanceof UriLocation) {
-				
-				UriLocation uriLocation = (UriLocation) rootLocation;
-				String uriAsString = null;
-				Node uriNode = n.getAttributes().getNamedItem("uri");
-				
-				if (uriNode != null) {
-					uriAsString = uriNode.getNodeValue();
-					URI uri = UriUtils.toUri(uriAsString);
-					uriLocation.setUri(uri);
-				}
-				uriLocation.setDecorators(decorators);
-			}
+			uriLocation.setDecorators(decorators);
 		}
 		NodeList nl = n.getChildNodes();
 		if(nl != null && nl.getLength() > 0) {
@@ -169,7 +174,7 @@ public class ConfigXmlParser {
 			for(int i = 0 ; i < nl.getLength();i++) {
 				
 				Node node = nl.item(i);
-				String nodeName = node.getNodeName();
+				nodeName = node.getNodeName();
 				
 				if (!nodeName.startsWith("#")) {
 					
@@ -196,8 +201,7 @@ public class ConfigXmlParser {
 						}
 					}
 					if ("decorator".equals(nodeName)) {
-						Decorator decorator = parseDecorator(node);
-						decorators.add(decorator);
+						decorators.addAll(parseDecorator(node));
 					}
 				}
 			}
@@ -207,9 +211,10 @@ public class ConfigXmlParser {
 		return locations;	
 	}
 
-	private Decorator parseDecorator(Node n) {
+	private Collection<Decorator> parseDecorator(Node n) {
 		
 		System.out.println(n.getNodeName());
+		Collection<Decorator> decorators = new ArrayList<Decorator>();
 		String method = n.getAttributes().getNamedItem("method").getNodeValue();
 		
 		NodeList nl = n.getChildNodes();
@@ -221,19 +226,46 @@ public class ConfigXmlParser {
 				String nodeName = node.getNodeName();
 				
 				if (!nodeName.startsWith("#")) {
-					return parseTag(node, method);
+					decorators.add(parseTag(node, method));
 				}
 			}
 		}
-		return null;
+		return decorators;
 	}
 
 	private Decorator parseTag(final Node n, String method) {
 
 		System.out.println(n.getNodeName());
+		String className = n.getNodeName();
+		if (!className.contains(".")) {
+			className = TagFactory.DEFAULT_TAG_PACKAGE_PREFIX + StringUtils.capitalize(className); 
+		}
+		Tag tag = tagFactory.build(className);
 		
-		Tag tag = tagFactory.build(TagFactory.DEFAULT_TAG_PACKAGE_PREFIX + StringUtils.capitalize(n.getNodeName()));
+		if ((tag instanceof SingleTag) || (tag instanceof DoubleTag) || (tag instanceof TripleTag)) {
+			String textContent = n.getTextContent();
+			if ((textContent != null) && (!textContent.isEmpty())) {
+				callSetterMethod(tag, "value", textContent);
+			}
+		}
+		NamedNodeMap attributes = n.getAttributes();
+		for (int i = 0; i < attributes.getLength(); i++) {
+			String key = attributes.item(i).getNodeName();
+			String value = attributes.item(i).getNodeValue();
+			callSetterMethod(tag, key, value);
+		}
 		return decoratorFactory.build(tag, method);
+	}
+
+	private void callSetterMethod(Object obj, String field, String value) {
+		
+		Method m = null;
+		try {
+			m = obj.getClass().getDeclaredMethod("set" + StringUtils.capitalize(field), String.class);
+			m.invoke(obj, value);
+		} catch (Exception e) { 
+			e.printStackTrace();
+		}
 	}
 
 	public LocationFactory getLocationFactory() {
