@@ -10,7 +10,7 @@ import org.bluemagic.config.util.UriUtils;
 
 public class SingleTagDecorator extends TagDecorator {
 
-	protected String tagParameterKey = "tags";
+	public static String tagParameterKey = "tags";
 	
 	private Tag tag;
 
@@ -52,7 +52,7 @@ public class SingleTagDecorator extends TagDecorator {
 	}
 
 	public void setTagParameterKey(String tagParameterKey) {
-		this.tagParameterKey = tagParameterKey;
+		SingleTagDecorator.tagParameterKey = tagParameterKey;
 	}
 
 	public String getTagParameterKey() {

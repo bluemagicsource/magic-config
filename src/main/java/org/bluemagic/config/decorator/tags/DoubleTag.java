@@ -54,6 +54,11 @@ public class DoubleTag extends SingleTag {
 		return this.key + "=" + getValue();
 	}
 	
+	@Override
+	public int hashCode() {
+		return key.hashCode() + prefix.hashCode() + value.hashCode() + suffix.hashCode();
+	}
+	
 	public void setKey(String key) {
 		this.key = key;
 	}

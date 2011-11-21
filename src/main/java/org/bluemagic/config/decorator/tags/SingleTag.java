@@ -48,6 +48,11 @@ public class SingleTag implements Tag {
 		return getValue();
 	}
 	
+	@Override
+	public int hashCode() {
+		return prefix.hashCode() + value.hashCode() + suffix.hashCode();
+	}
+	
 	public String getPrefix() {
 		return prefix;
 	}

@@ -9,7 +9,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.util.RestUtils;
+import org.bluemagic.config.location.remote.RestClientManager;
+import org.bluemagic.config.location.remote.SimpleRestClientManager;
 import org.bluemagic.config.util.UriUtils;
 
 /**
@@ -26,7 +27,16 @@ public class RemoteLocation extends UriLocation {
 	
 	private static Map<URI, Set<String>> prefetched;
 	
+	private RestClientManager restClientManager;
+	
 	private boolean prefetch = false;
+
+	public void init() {
+		
+		if (restClientManager == null) {
+			restClientManager = new SimpleRestClientManager();
+		}
+	}
 	
 	/**
 	 * Uses the location and optional search criteria to locate the data and
@@ -73,13 +83,13 @@ public class RemoteLocation extends UriLocation {
 				propertyUri = UriUtils.toUri(this.uri.toASCIIString() + "/" + key);
 			}
 		}
-		return RestUtils.get(propertyUri);
+		return restClientManager.get(propertyUri);
 	}
 	
 	public Set<String> searchForKeys(URI baseUri) {
 
 		Set<String> keySet = new HashSet<String>();
-		String searchResults = RestUtils.get(baseUri);
+		String searchResults = restClientManager.get(baseUri);
 		String[] split = searchResults.split("\n");
 		
 		for (String uriAsString : split) {
@@ -108,5 +118,13 @@ public class RemoteLocation extends UriLocation {
 
 	public boolean isPrefetch() {
 		return prefetch;
+	}
+
+	public void setRestClientManager(RestClientManager restClientManager) {
+		this.restClientManager = restClientManager;
+	}
+
+	public RestClientManager getRestClientManager() {
+		return restClientManager;
 	}
 }

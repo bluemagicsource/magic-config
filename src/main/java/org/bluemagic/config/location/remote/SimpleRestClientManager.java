@@ -1,20 +1,25 @@
-package org.bluemagic.config.util;
+package org.bluemagic.config.location.remote;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class RestUtils {
+public class SimpleRestClientManager implements RestClientManager {
 	
-	private static final Log LOG = LogFactory.getLog(RestUtils.class);
-	
-	public static String get(URI uri) {
+	private static final Log LOG = LogFactory.getLog(SimpleRestClientManager.class);
 
+	public String post(URI uri, Map<String, String> parameters) {
+		throw new UnsupportedOperationException();
+	}
+
+	public String get(URI uri) {
+		
 		URL url = null;
 		String rval = null;
 		BufferedReader urlReader = null;
@@ -64,7 +69,6 @@ public class RestUtils {
 	
 		} catch (Throwable t) {
 			LOG.trace("Failed to retrieve data from the server:" + url.toString(), t);
-			throw new RuntimeException("Failed to retrieve data from the server " + url, t);
 	
 		} finally {
 	
@@ -80,5 +84,13 @@ public class RestUtils {
 			}
 		}
 		return rval;
+	}
+
+	public String update(URI uri, Map<String, String> parameters) {
+		throw new UnsupportedOperationException();
+	}
+
+	public String delete(URI uri) {
+		throw new UnsupportedOperationException();
 	}
 }

@@ -9,6 +9,8 @@ package org.bluemagic.config.decorator.tags;
  *
  */
 public class TripleTag extends SingleTag {
+	
+	private static String nameSpacePredicateSeperator = ":";
 
 	private String namespace;
 	
@@ -56,12 +58,17 @@ public class TripleTag extends SingleTag {
 		
 		StringBuilder b = new StringBuilder();
 		b.append(this.namespace);
-		b.append(":");
+		b.append(getNameSpacePredicateSeperator());
 		b.append(this.predicate);
 		b.append("=");
 		b.append(getValue());
 
 		return b.toString();
+	}
+	
+	@Override
+	public int hashCode() {
+		return namespace.hashCode() + predicate.hashCode() + prefix.hashCode() + value.hashCode() + suffix.hashCode();
 	}
 	
 	public void setPredicate(String predicate) {
@@ -78,5 +85,14 @@ public class TripleTag extends SingleTag {
 
 	public String getNamespace() {
 		return namespace;
+	}
+
+	public static void setNameSpacePredicateSeperator(
+			String nameSpacePredicateSeperator) {
+		TripleTag.nameSpacePredicateSeperator = nameSpacePredicateSeperator;
+	}
+
+	public static String getNameSpacePredicateSeperator() {
+		return nameSpacePredicateSeperator;
 	}
 }
