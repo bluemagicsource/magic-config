@@ -1,6 +1,7 @@
 package org.bluemagic.config.location;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,6 +50,9 @@ public class RemoteLocation extends UriLocation {
 	 * @ param searchCriteria - Not used by this implementation.
 	 **/
 	public String get(URI key, Map<MagicKey, Object> parameters) {
+		// Until we figure out how to initialize this automatically via xml,
+		// we should initialize it here.
+		init();
 		
 		if (prefetch) {
 			
@@ -72,7 +76,7 @@ public class RemoteLocation extends UriLocation {
 			}
 		}
 		URI propertyUri = key;
-
+		
 		// IF URI NOT DEFINED THEN USE KEY AS URI
 		if (this.uri != null) {
 			
@@ -80,9 +84,10 @@ public class RemoteLocation extends UriLocation {
 			if (this.uri.toASCIIString().endsWith("/")) {
 				propertyUri = UriUtils.toUri(this.uri.toASCIIString() + key);
 			} else {
-				propertyUri = UriUtils.toUri(this.uri.toASCIIString() + "/" + key);
+				propertyUri = UriUtils.toUri(this.uri.toASCIIString());
 			}
 		}
+		
 		return restClientManager.get(propertyUri);
 	}
 	
@@ -96,6 +101,15 @@ public class RemoteLocation extends UriLocation {
 			keySet.add(uriAsString);
 		}
 		return keySet;
+	}
+	
+	@Override
+	protected void addOriginalURI(Collection<URI> decorated, URI key) {
+		if (this.uri.toASCIIString().endsWith("/")) {
+			decorated.add(UriUtils.toUri(this.uri.toASCIIString() + key.toASCIIString()));
+		} else {
+			decorated.add(UriUtils.toUri(this.uri.toASCIIString() + "/" + key.toASCIIString()));			
+		}
 	}
 
 	public boolean supports(URI key) {

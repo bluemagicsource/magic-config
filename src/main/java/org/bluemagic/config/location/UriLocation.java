@@ -22,9 +22,10 @@ public abstract class UriLocation implements Location {
 		URI originalUri = this.uri;
 		String result = null;
 		Collection<URI> decorated = new ArrayList<URI>();
-		decorated.add(this.uri);
 		
-		List<Decorator> reversedDecorators = new ArrayList<Decorator>(decorators);
+		addOriginalURI(decorated, key);
+		
+		List<Decorator> reversedDecorators = new ArrayList<Decorator>(getDecorators());
 		Collections.reverse(reversedDecorators);
 		
 		for (Decorator decorator : reversedDecorators) {
@@ -43,6 +44,46 @@ public abstract class UriLocation implements Location {
 		return result;
 	}
 	
+	/**
+	 * <p>
+	 * This method should be overridden if additional logic needs to be done
+	 * to determine the original uri (such as in the RemoteLocation class).  By default this method just adds
+	 * this class's URI parameter to the list of URI's to be decorated.
+	 * </p>
+	 * 
+	 * <p>
+	 * The need for this method arose because of the RemoteLocation.  For RemoteLocation's
+	 * the original URI consists of the URI parameter plus the key appended to the end.
+	 * </p>
+	 * 
+	 * <p>
+	 * An example of a remote location:<br>
+	 * URI: http://www.xyz.com/property/<br>
+	 * Key: some/really/cool/property
+	 * </p>
+	 * 
+	 * <p>
+	 * RemoteLocation original uri should be:  http://www.xyz.com/property/some/really/cool/property
+	 * </p>
+	 * 
+	 * <p>
+	 * Then this URI should be decorated with the tags.  For example, a single suffix tag, "test":
+	 * </p>
+	 * 
+	 * <p>
+	 * Result:  http://www.xyz.com/property/some/really/cool/property?tags=test
+	 * </p>
+	 * 
+	 * <p>
+	 * With the way it was before, the result would have been:
+	 * </p>
+	 * 
+	 * http://www.xyz.com/property/?tags=test/some/really/cool/property , which is not what we are looking for.
+	 */
+	protected void addOriginalURI(Collection<URI> decorated, URI key) {
+		decorated.add(this.uri);
+	}
+
 	public abstract String get(URI key, Map<MagicKey, Object> parameters);
 
 	public void setUri(URI uri) {
@@ -58,6 +99,10 @@ public abstract class UriLocation implements Location {
 	}
 
 	public Collection<Decorator> getDecorators() {
+		if (decorators == null || decorators.isEmpty()) {
+			return Collections.<Decorator>emptyList();
+		}
+		
 		return decorators;
 	}
 }
