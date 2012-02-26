@@ -56,4 +56,18 @@ public class BlueMagicPropertiesTest {
 		//foo = bmp.get("fu");
 		//System.out.println("fu=" + foo.toString());
 	}
+	
+	@Test
+    public void loadPropertyTwice() {
+        
+        Properties bmp = new BlueMagicProperties("sample-magic-config.xml");
+        Object test = bmp.get("test");
+        System.out.println("\n\ntest=" + test.toString());
+        
+        test = bmp.get("test");
+        System.out.println("test=" + test.toString());
+        
+        //foo = bmp.get("fu");
+        //System.out.println("fu=" + foo.toString());
+    }
 }
