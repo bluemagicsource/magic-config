@@ -3,4 +3,5 @@
 <properties>
 <entry key="foo">bar</entry>
 <entry key="fu">baz</entry>
+<entry key="test">success</entry>
 </properties>

@@ -142,8 +142,13 @@ public class BlueMagicProperties extends Properties {
 		}
 		parameters.put(MagicKey.ORIGINAL_URI, key);
 		
+		// CHECK IF THIS PROPERTY WAS ALREADY FOUND
+        final Object ret = super.get(key.toASCIIString());
+        if (ret != null) {
+            value = ret.toString();
+        }
 		// THE CORE PART THAT CHECKS EACH LOCATION FOR PROPERTIES
-		if (configLocations != null) {
+		if (value == null && configLocations != null) {
 			for (Location location : configLocations) {
 				
 				try {
@@ -152,6 +157,7 @@ public class BlueMagicProperties extends Properties {
 						
 						// CHECK TO SEE IF WE FOUND A VALUE
 						if (value != null) {
+						    super.put(key.toASCIIString(), value);
 							break;
 						}
 					}
@@ -166,13 +172,7 @@ public class BlueMagicProperties extends Properties {
 		} else {
 			LOG.debug("Found property: " + key + " at location: " + parameters.get(MagicKey.RESOLVED_URI));
 		}
-		// CHECK WITH PARENT PROPERTIES TO SEE IF SOMEONE ADDED IT
-		if (value == null) {
-			Object ret = super.get(key.toASCIIString());
-			if (ret != null) {
-				value = ret.toString();
-			}
-		}
+		
 		return value;
 	}
 
