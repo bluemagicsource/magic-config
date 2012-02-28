@@ -237,9 +237,7 @@ public class ConfigXmlParser {
 
 		System.out.println(n.getNodeName());
 		String className = n.getNodeName();
-		if (!className.contains(".")) {
-			className = TagFactory.DEFAULT_TAG_PACKAGE_PREFIX + StringUtils.capitalize(className); 
-		}
+		
 		Tag tag = tagFactory.build(className);
 		
 		if ((tag instanceof SingleTag) || (tag instanceof DoubleTag) || (tag instanceof TripleTag)) {
