@@ -22,12 +22,12 @@ public class TripleTagDecoratorTest {
 		tripleTag.setValue("53.60913");
 		
 		TripleTagDecorator ttd = new TripleTagDecorator();
-		ttd.setTripleTag(tripleTag);
+		ttd.setTag(tripleTag);
 		
 		URI key = UriUtils.toUri("abc");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("geo:lon=53.60913.abc", ttd.decoratePrefix(key, parameters).toASCIIString());
+		assertEquals("geo" + tripleTag.getNameSpacePredicateSeparator() + "lon" + tripleTag.getPredicateValueSeparator() + "53.60913.abc", ttd.decoratePrefix(key, parameters).toASCIIString());
 	}
 	
 	@Test
@@ -39,12 +39,12 @@ public class TripleTagDecoratorTest {
 		tripleTag.setValue("53.60913");
 		
 		TripleTagDecorator ttd = new TripleTagDecorator();
-		ttd.setTripleTag(tripleTag);
+		ttd.setTag(tripleTag);
 		
 		URI key = UriUtils.toUri("abc/?/jackster");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("abc/geo:lon=53.60913/jackster", ttd.decoratePlaceholder(key, "?", parameters).toASCIIString());
+		assertEquals("abc/geo" + tripleTag.getNameSpacePredicateSeparator() + "lon" + tripleTag.getPredicateValueSeparator() + "53.60913/jackster", ttd.decoratePlaceholder(key, "?", parameters).toASCIIString());
 	}
 	
 	@Test
@@ -56,11 +56,11 @@ public class TripleTagDecoratorTest {
 		tripleTag.setValue("53.60913");
 		
 		TripleTagDecorator ttd = new TripleTagDecorator();
-		ttd.setTripleTag(tripleTag);
+		ttd.setTag(tripleTag);
 		
 		URI key = UriUtils.toUri("abc");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("abc?geo:lon=53.60913", ttd.decorateSuffix(key, parameters).toASCIIString());
+		assertEquals("abc?geo" + tripleTag.getNameSpacePredicateSeparator() + "lon" + tripleTag.getPredicateValueSeparator() + "53.60913", ttd.decorateSuffix(key, parameters).toASCIIString());
 	}
 }

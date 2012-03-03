@@ -21,12 +21,12 @@ public class DoubleTagDecoratorTest {
 		doubleTag.setValue("v1");
 		
 		DoubleTagDecorator dtd = new DoubleTagDecorator();
-		dtd.setDoubleTag(doubleTag);
+		dtd.setTag(doubleTag);
 		
 		URI key = UriUtils.toUri("abc");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("k1=v1.abc", dtd.decoratePrefix(key, parameters).toASCIIString());
+		assertEquals("k1" + doubleTag.getKeyValueSeparator() +  "v1.abc", dtd.decoratePrefix(key, parameters).toASCIIString());
 	}
 	
 	@Test
@@ -37,12 +37,48 @@ public class DoubleTagDecoratorTest {
 		doubleTag.setValue("v1");
 		
 		DoubleTagDecorator dtd = new DoubleTagDecorator();
-		dtd.setDoubleTag(doubleTag);
+		dtd.setTag(doubleTag);
 		
 		URI key = UriUtils.toUri("abc/?/jackster");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("abc/k1=v1/jackster", dtd.decoratePlaceholder(key, "?", parameters).toASCIIString());
+		assertEquals("abc/k1" + doubleTag.getKeyValueSeparator() + "v1/jackster", dtd.decoratePlaceholder(key, "?", parameters).toASCIIString());
+	}
+	
+	@Test
+	public void complexDecoratePlaceholder() {
+		
+		DoubleTag doubleTag = new DoubleTag();
+		doubleTag.setKey("k1");
+		doubleTag.setValue("v1");
+		
+		DoubleTagDecorator dtd = new DoubleTagDecorator();
+		dtd.setTag(doubleTag);
+		
+		URI key = UriUtils.toUri("abc/zeta=123" + dtd.getPlaceholderSeparator() + "charmer=567/jackster");
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		parameters.put(MagicKey.ORIGINAL_URI, UriUtils.toUri("abc/?/jackster"));
+		
+		assertEquals("abc/charmer=567-k1=v1-zeta=123/jackster", dtd.decoratePlaceholder(key, "?", parameters).toASCIIString());
+	}
+	
+	@Test
+	public void complexDecoratePlaceholder2() {
+		
+		DoubleTag doubleTag = new DoubleTag();
+		doubleTag.setKey("k1");
+		doubleTag.setValue("v1");
+		doubleTag.setKeyValueSeparator("-");
+		
+		DoubleTagDecorator dtd = new DoubleTagDecorator();
+		dtd.setPlaceholderSeparator("/");
+		dtd.setTag(doubleTag);
+		
+		URI key = UriUtils.toUri("abc/zeta-123" + dtd.getPlaceholderSeparator() + "charmer-567/jackster");
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		parameters.put(MagicKey.ORIGINAL_URI, UriUtils.toUri("abc/?/jackster"));
+		
+		assertEquals("abc/charmer-567/k1-v1/zeta-123/jackster", dtd.decoratePlaceholder(key, "?", parameters).toASCIIString());
 	}
 	
 	@Test
@@ -53,11 +89,11 @@ public class DoubleTagDecoratorTest {
 		doubleTag.setValue("v1");
 		
 		DoubleTagDecorator dtd = new DoubleTagDecorator();
-		dtd.setDoubleTag(doubleTag);
+		dtd.setTag(doubleTag);
 		
 		URI key = UriUtils.toUri("abc");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("abc?k1=v1", dtd.decorateSuffix(key, parameters).toASCIIString());
+		assertEquals("abc?k1" + doubleTag.getKeyValueSeparator() + "v1", dtd.decorateSuffix(key, parameters).toASCIIString());
 	}
 }

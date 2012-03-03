@@ -60,6 +60,6 @@ public class TripleTagTest {
 	public void checkToString() {
 		
 		TripleTag tt1 = new TripleTag("namespace", "predicate", "value");
-		assertEquals("namespace:predicate=value", tt1.toString());
+		assertEquals("namespace" + tt1.getNameSpacePredicateSeparator() + "predicate" + tt1.getPredicateValueSeparator() + "value", tt1.toString());
 	}
 }

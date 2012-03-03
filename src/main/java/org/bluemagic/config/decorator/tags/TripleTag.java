@@ -10,11 +10,13 @@ package org.bluemagic.config.decorator.tags;
  */
 public class TripleTag extends SingleTag {
 	
-	private static String nameSpacePredicateSeperator = ":";
-
-	private String namespace;
+	private String nameSpacePredicateSeparator = ":";
 	
-	private String predicate;
+	private String predicateValueSeparator = "=";
+
+	private String namespace = "";
+	
+	private String predicate = "";
 
 	public TripleTag() { }
 	
@@ -58,9 +60,9 @@ public class TripleTag extends SingleTag {
 		
 		StringBuilder b = new StringBuilder();
 		b.append(this.namespace);
-		b.append(getNameSpacePredicateSeperator());
+		b.append(this.nameSpacePredicateSeparator);
 		b.append(this.predicate);
-		b.append("=");
+		b.append(this.predicateValueSeparator);
 		b.append(getValue());
 
 		return b.toString();
@@ -87,12 +89,20 @@ public class TripleTag extends SingleTag {
 		return namespace;
 	}
 
-	public static void setNameSpacePredicateSeperator(
-			String nameSpacePredicateSeperator) {
-		TripleTag.nameSpacePredicateSeperator = nameSpacePredicateSeperator;
+	public String getNameSpacePredicateSeparator() {
+		return nameSpacePredicateSeparator;
 	}
 
-	public static String getNameSpacePredicateSeperator() {
-		return nameSpacePredicateSeperator;
+	public void setNameSpacePredicateSeparator(
+			String nameSpacePredicateSeparator) {
+		this.nameSpacePredicateSeparator = nameSpacePredicateSeparator;
+	}
+
+	public String getPredicateValueSeparator() {
+		return predicateValueSeparator;
+	}
+
+	public void setPredicateValueSeparator(String predicateValueSeparator) {
+		this.predicateValueSeparator = predicateValueSeparator;
 	}
 }

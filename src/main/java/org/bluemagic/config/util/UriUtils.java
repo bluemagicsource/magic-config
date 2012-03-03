@@ -182,4 +182,66 @@ private static final Log LOG = LogFactory.getLog(UriUtils.class);
     	}
     	return uri;
 	}
+
+	public static String[] splitUriIntoPrefixParts(URI key, URI originalUri, String separator) {
+
+		String[] keySplit = splitUriAfterScheme(key);
+		
+		if (originalUri == null) {
+			originalUri = key;
+		}
+		String[] originalSplit = splitUriAfterScheme(originalUri);
+		
+		String scheme = keySplit[0];
+		String prefixTags = "";
+		
+		if (!originalSplit[1].isEmpty()) {
+			
+			if (!keySplit[1].equals(originalSplit[1])) {
+				
+				String findMe = "";
+				
+				if (keySplit[1].length() > 0) {
+					findMe = separator + originalSplit[1];
+				} else {
+					findMe = originalSplit[1];
+				}
+				prefixTags = keySplit[1].replaceAll(findMe, "");
+			}
+		}
+		
+		String[] split = new String[3];
+		split[0] = scheme;
+		split[1] = prefixTags;
+		split[2] = originalSplit[1];
+		
+		return split;
+	}
+
+	public static String[] splitUriIntoPlaceholderParts(URI key, URI originalUri, String replace) {
+
+		String[] split = new String[3];
+		String keyAsString = key.toASCIIString();
+		
+		if (originalUri == null) {
+			originalUri = key;
+		}
+		String originalUriAsString = originalUri.toASCIIString();
+		
+		int replaceStart = originalUriAsString.indexOf(replace);
+		
+		String beforePlaceholder = originalUriAsString.substring(0, replaceStart);
+		String afterPlaceholder = originalUriAsString.substring(replaceStart + replace.length());
+		String placeholderTags = keyAsString.replace(beforePlaceholder, "").replace(afterPlaceholder, ""); 
+		
+		if (replace.equals(placeholderTags)) {
+			placeholderTags = "";
+		}
+		
+		split[0] = beforePlaceholder;
+		split[1] = placeholderTags;
+		split[2] = afterPlaceholder;
+		
+		return split;
+	}
 }

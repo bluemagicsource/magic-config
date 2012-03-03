@@ -4,48 +4,38 @@ import java.net.URI;
 import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.decorator.tags.DoubleTag;
+import org.bluemagic.config.util.UnsupportedTagException;
 import org.bluemagic.config.util.UriUtils;
 
 public class DoubleTagDecorator extends TagDecorator {
-	
-	private DoubleTag doubleTag;
-
-	public URI decoratePrefix(URI key, Map<MagicKey, Object> parameters) {
-		
-		StringBuilder u = new StringBuilder();
-		String[] split = UriUtils.splitUriAfterScheme(key);
-		
-		u.append(split[0]);
-		u.append(doubleTag.getKey());
-		u.append("=");
-		u.append(doubleTag.getValue());
-		u.append(prefixSeperator);
-		u.append(split[1]);
-		
-		return UriUtils.toUri(u.toString());
-	}
-
-	public URI decoratePlaceholder(URI key, String replace, Map<MagicKey, Object> parameters) {
-		
-		String uriAsString = "";
-		
-		uriAsString = key.toASCIIString().replace(replace, doubleTag.getKey() + "=" + doubleTag.getValue());
-		
-		return UriUtils.toUri(uriAsString);
-	}
 
 	public URI decorateSuffix(URI key, Map<MagicKey, Object> parameters) {
+		
+		DoubleTag doubleTag = (DoubleTag) getTag();
 		
 		// ADD PARAMETER TO THE URI
 		return UriUtils.addParameterToUri(key, doubleTag.getKey(), doubleTag.getValue());
 	}
-
-	public void setDoubleTag(DoubleTag doubleTag) {
-		this.doubleTag = doubleTag;
+	
+	public boolean supports(Tag tag) {
+		
+		boolean supports = false;
+		
+		// CHECK TYPE OF TAG
+		if (tag instanceof DoubleTag) {
+			supports = true;
+		}
+		return supports;
 	}
-
-	public DoubleTag getDoubleTag() {
-		return doubleTag;
+	
+	@Override
+	public void setTag(Tag tag) {
+		
+		if (!supports(tag)) {
+			throw new UnsupportedTagException(this.getClass(), DoubleTag.class, tag.getClass());
+		}
+		super.setTag(tag);
 	}
 }

@@ -38,4 +38,156 @@ public class UriUtilsTest {
 
 		Assert.assertTrue(results.size() == 0);
 	}
+	
+	@Test
+	public void testParsePrefixPart() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("file://jack.maribel.janet.my.properties.xml");
+			originalUri = new URI("file://my.properties.xml");
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPrefixParts(key, originalUri, ".");
+
+		Assert.assertEquals("file://", array[0]);
+		Assert.assertEquals("jack.maribel.janet", array[1]);
+		Assert.assertEquals("my.properties.xml", array[2]);
+	}
+	
+	@Test
+	public void testParsePrefixPartNoTags() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("file://my.properties.xml");
+			originalUri = new URI("file://my.properties.xml");
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPrefixParts(key, originalUri, ".");
+
+		Assert.assertEquals("file://", array[0]);
+		Assert.assertEquals("", array[1]);
+		Assert.assertEquals("my.properties.xml", array[2]);
+	}
+	
+	@Test
+	public void testParsePrefixPartNoScheme() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("my.properties.xml");
+			originalUri = new URI("my.properties.xml");
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPrefixParts(key, originalUri, ".");
+
+		Assert.assertEquals("", array[0]);
+		Assert.assertEquals("", array[1]);
+		Assert.assertEquals("my.properties.xml", array[2]);
+	}
+	
+	@Test
+	public void testParsePrefixPartNoSchemeOnlyTags() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("jack.maribel.janet.my.properties.xml");
+			originalUri = new URI("my.properties.xml");
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPrefixParts(key, originalUri, ".");
+
+		Assert.assertEquals("", array[0]);
+		Assert.assertEquals("jack.maribel.janet", array[1]);
+		Assert.assertEquals("my.properties.xml", array[2]);
+	}
+	
+	@Test
+	public void testParsePrefixPartNoTagsNull() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("file://my.properties.xml");
+			originalUri = null;
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPrefixParts(key, originalUri, ".");
+
+		Assert.assertEquals("file://", array[0]);
+		Assert.assertEquals("", array[1]);
+		Assert.assertEquals("my.properties.xml", array[2]);
+	}
+	
+	@Test
+	public void testParsePrefixPartNoSchemeNull() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("my.properties.xml");
+			originalUri = null;
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPrefixParts(key, originalUri, ".");
+
+		Assert.assertEquals("", array[0]);
+		Assert.assertEquals("", array[1]);
+		Assert.assertEquals("my.properties.xml", array[2]);
+	}
+	
+	@Test
+	public void testParsePrefixPartNoSchemeOnlyTagsNull() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("jack.maribel.janet.my.properties.xml");
+			originalUri = null;
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPrefixParts(key, originalUri, ".");
+
+		Assert.assertEquals("", array[0]);
+		Assert.assertEquals("", array[1]);
+		Assert.assertEquals("jack.maribel.janet.my.properties.xml", array[2]);
+	}
+	
+	@Test
+	public void testSplitUriIntoPlaceholderParts() {
+
+		URI key = null;
+		URI originalUri = null;
+		try {
+			key = new URI("abc-jabooty-my.properties.xml");
+			originalUri = new URI("abc-?-my.properties.xml");
+		} catch (Throwable t) {
+			Assert.fail("failed to create key");
+		}
+
+		String[] array = UriUtils.splitUriIntoPlaceholderParts(key, originalUri, "?");
+
+		Assert.assertEquals("abc-", array[0]);
+		Assert.assertEquals("jabooty", array[1]);
+		Assert.assertEquals("-my.properties.xml", array[2]);
+	}
 }

@@ -9,7 +9,7 @@ package org.bluemagic.config.decorator.tags;
  */
 public class Hashtag extends SingleTag {
 
-	private static final String HASHTAG_PREFIX = "#";
+	public static final String HASHTAG_PREFIX = "#";
 
 	public Hashtag() { 
 		this.prefix = HASHTAG_PREFIX;

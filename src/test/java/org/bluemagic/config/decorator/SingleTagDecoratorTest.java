@@ -59,6 +59,22 @@ public class SingleTagDecoratorTest {
 	}
 	
 	@Test
+	public void complexDecoratePlaceholder() {
+		
+		SingleTag singleTag = new SingleTag();
+		singleTag.setValue("myTag");
+		
+		SingleTagDecorator std = new SingleTagDecorator();
+		std.setTag(singleTag);
+		
+		URI key = UriUtils.toUri("abc/zeta" + std.getPlaceholderSeparator() + "charmer/jackster");
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		parameters.put(MagicKey.ORIGINAL_URI, UriUtils.toUri("abc/" + std.getPlaceholder() + "/jackster"));
+		
+		assertEquals("abc/charmer-myTag-zeta/jackster", std.decoratePlaceholder(key, "?", parameters).toASCIIString());
+	}
+	
+	@Test
 	public void simpleDecorateSuffix() {
 		
 		SingleTag singleTag = new SingleTag();
@@ -71,5 +87,20 @@ public class SingleTagDecoratorTest {
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
 		assertEquals("abc?tags=myTag", std.decorateSuffix(key, parameters).toASCIIString());
+	}
+	
+	@Test
+	public void simpleDecorateSuffixMultipleTags() {
+		
+		SingleTag singleTag = new SingleTag();
+		singleTag.setValue("myTag");
+		
+		SingleTagDecorator std = new SingleTagDecorator();
+		std.setTag(singleTag);
+		
+		URI key = UriUtils.toUri("abc?" + std.getTagParameterKey() + "=alert" + std.getSuffixSeperator() + "boston");
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		
+		assertEquals("abc?" + std.getTagParameterKey() + "=alert" + std.getSuffixSeperator() + "boston"+ std.getSuffixSeperator() + "myTag", std.decorateSuffix(key, parameters).toASCIIString());
 	}
 }

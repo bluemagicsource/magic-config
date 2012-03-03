@@ -10,15 +10,15 @@ public class UsernameTagTest {
 	public void checkPrefix() {
 		
 		UsernameTag uTag = new UsernameTag();
-		uTag.setValue("@abc");
-		assertEquals("@abc", uTag.getValue());
+		uTag.setValue(UsernameTag.USERNAME_PREFIX + "abc");
+		assertEquals(UsernameTag.USERNAME_PREFIX + "abc", uTag.getValue());
 		
 		uTag = new UsernameTag();
 		uTag.setValue("abc");
-		assertEquals("@abc", uTag.getValue());
+		assertEquals(UsernameTag.USERNAME_PREFIX + "abc", uTag.getValue());
 		
 		uTag = new UsernameTag();
 		uTag.setValue("abc");
-		assertEquals("@abc", uTag.toString());
+		assertEquals(UsernameTag.USERNAME_PREFIX + "abc", uTag.toString());
 	}
 }

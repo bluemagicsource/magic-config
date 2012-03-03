@@ -10,15 +10,15 @@ public class HashtagTest {
 	public void checkPrefix() {
 		
 		Hashtag htag = new Hashtag();
-		htag.setValue("#abc");
-		assertEquals("#abc", htag.getValue());
+		htag.setValue(Hashtag.HASHTAG_PREFIX + "abc");
+		assertEquals(Hashtag.HASHTAG_PREFIX + "abc", htag.getValue());
 		
 		htag = new Hashtag();
 		htag.setValue("abc");
-		assertEquals("#abc", htag.getValue());
+		assertEquals(Hashtag.HASHTAG_PREFIX + "abc", htag.getValue());
 		
 		htag = new Hashtag();
 		htag.setValue("abc");
-		assertEquals("#abc", htag.toString());
+		assertEquals(Hashtag.HASHTAG_PREFIX + "abc", htag.toString());
 	}
 }

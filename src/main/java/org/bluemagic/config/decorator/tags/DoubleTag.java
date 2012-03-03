@@ -11,7 +11,10 @@ package org.bluemagic.config.decorator.tags;
  */
 public class DoubleTag extends SingleTag {
 
+	private String keyValueSeparator = "=";
+	
 	private String key = "";
+	
 	
 	public DoubleTag() { }
 	
@@ -51,7 +54,14 @@ public class DoubleTag extends SingleTag {
 	
 	@Override
 	public String toString() {
-		return this.key + "=" + getValue();
+		
+		StringBuilder b = new StringBuilder();
+		
+		b.append(this.key);
+		b.append(this.keyValueSeparator);
+		b.append(getValue());
+		
+		return b.toString();
 	}
 	
 	@Override
@@ -65,5 +75,13 @@ public class DoubleTag extends SingleTag {
 
 	public String getKey() {
 		return key;
+	}
+
+	public String getKeyValueSeparator() {
+		return keyValueSeparator;
+	}
+
+	public void setKeyValueSeparator(String keyValueSeparator) {
+		this.keyValueSeparator = keyValueSeparator;
 	}
 }

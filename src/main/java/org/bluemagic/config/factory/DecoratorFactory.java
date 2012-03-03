@@ -18,13 +18,13 @@ public class DecoratorFactory {
 		
 		if (tag instanceof TripleTag) {
 			TripleTagDecorator ttd = new TripleTagDecorator();
-			ttd.setTripleTag((TripleTag) tag);
+			ttd.setTag(tag);
 			ttd.setMethod(getMethod(method));
 			decorator = ttd;
 			
 		} else if (tag instanceof DoubleTag) {
 			DoubleTagDecorator dtd = new DoubleTagDecorator();
-			dtd.setDoubleTag((DoubleTag) tag);
+			dtd.setTag(tag);
 			dtd.setMethod(getMethod(method));
 			decorator = dtd;
 			

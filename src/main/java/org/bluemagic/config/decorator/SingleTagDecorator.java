@@ -6,64 +6,72 @@ import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.Tag;
+import org.bluemagic.config.decorator.tags.SingleTag;
+import org.bluemagic.config.util.UnsupportedTagException;
 import org.bluemagic.config.util.UriUtils;
 
 public class SingleTagDecorator extends TagDecorator {
 
-	public static String tagParameterKey = "tags";
-	
-	private Tag tag;
+	private String tagParameterKey = "tags";
 
-	public URI decoratePrefix(URI key, Map<MagicKey, Object> parameters) {
-		
-		StringBuilder u = new StringBuilder();
-		String[] split = UriUtils.splitUriAfterScheme(key);
-		
-		u.append(split[0]);
-		u.append(tag.getValue());
-		u.append(prefixSeperator);
-		u.append(split[1]);
-		
-		return UriUtils.toUri(u.toString());
-	}
+	private String suffixSeperator = ",";
 	
-	public URI decoratePlaceholder(URI key, String replace, Map<MagicKey, Object> parameters) {
-		
-		String uriAsString = "";
-		
-		uriAsString = key.toASCIIString().replace(replace, tag.getValue());
-		
-		return UriUtils.toUri(uriAsString);
-	}
-
 	public URI decorateSuffix(URI key, Map<MagicKey, Object> parameters) {
 
 		Map<String, String> keyParameters = new HashMap<String, String>();
 
+		// PARSE ALL THE URI PARAMETERS
 		keyParameters.putAll(UriUtils.parseUriParameters(key));
 		
+		// GRAB ANY EXISTING SINGLE TAGS
 		String tagsValue = keyParameters.get(tagParameterKey);
+		
 		if ((tagsValue != null) && (tagsValue.length() > 0)) {
-			tagsValue = tagsValue + "," + tag.getValue();
+			
+			// COMBINE THE CURRENT TAG WITH THE OTHERS
+			tagsValue = combineAndSortTags(this.getTag().getValue(), tagsValue, suffixSeperator);
+			
 		} else {
-			tagsValue = tag.getValue();
+			// THE ONLY SINGLETAG IS THE NEW ONE
+			tagsValue = getTag().getValue();
 		}
+		// COLLAPSE ADDING THE SINGLE TAGS WITH TAG PARAMETER KEY
 		return UriUtils.addParameterToUri(key, tagParameterKey, tagsValue);
 	}
 
-	public void setTagParameterKey(String tagParameterKey) {
-		SingleTagDecorator.tagParameterKey = tagParameterKey;
+	public boolean supports(Tag tag) {
+		
+		boolean supports = false;
+		
+		// CHECK TYPE OF TAG
+		if (tag instanceof SingleTag) {
+			supports = true;
+		}
+		return supports;
+	}
+	
+	@Override
+	public void setTag(Tag tag) {
+		
+		if (!supports(tag)) {
+			throw new UnsupportedTagException(this.getClass(), SingleTag.class, tag.getClass());
+		}
+		super.setTag(tag);
 	}
 
 	public String getTagParameterKey() {
 		return tagParameterKey;
 	}
-	
-	public Tag getTag() {
-		return tag;
+
+	public void setTagParameterKey(String tagParameterKey) {
+		this.tagParameterKey = tagParameterKey;
 	}
 
-	public void setTag(Tag tag) {
-		this.tag = tag;
+	public String getSuffixSeperator() {
+		return suffixSeperator;
+	}
+
+	public void setSuffixSeperator(String suffixSeperator) {
+		this.suffixSeperator = suffixSeperator;
 	}
 }

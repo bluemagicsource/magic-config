@@ -9,7 +9,7 @@ package org.bluemagic.config.decorator.tags;
  */
 public class UsernameTag extends SingleTag {
 
-    private static final String USERNAME_PREFIX = "@";
+    public static final String USERNAME_PREFIX = "@";
 
 	public UsernameTag() { 
 		this.prefix = USERNAME_PREFIX;
