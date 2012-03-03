@@ -259,7 +259,7 @@ public class ConfigXmlParser {
 		
 		Method m = null;
 		try {
-			m = obj.getClass().getDeclaredMethod("set" + StringUtils.capitalize(field), String.class);
+			m = obj.getClass().getMethod("set" + StringUtils.capitalize(field), String.class);
 			m.invoke(obj, value);
 		} catch (Exception e) { 
 			e.printStackTrace();
