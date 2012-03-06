@@ -13,6 +13,9 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.LocatedProperty;
+import org.bluemagic.config.api.property.MagicProperty;
+import org.bluemagic.config.api.property.MissingProperty;
 import org.bluemagic.config.util.UriUtils;
 
 /**
@@ -37,10 +40,10 @@ public class LocalLocation extends UriLocation {
 	 * 
 	 * 
 	 */
-	public String get(URI key, Map<MagicKey, Object> parameters) {
+	public MagicProperty locateHelper(URI key, Map<MagicKey, Object> parameters) {
 
 		File file = null;
-		String value = null;
+		MagicProperty property = null;
 		boolean useKeyAsUri = false;
 		boolean returnFile = false;
 		Properties properties = new Properties();
@@ -67,14 +70,21 @@ public class LocalLocation extends UriLocation {
 			} else {
 				// FILE ON THE CLASSPATH
 				String schemeSpecificPart = this.uri.getSchemeSpecificPart().replace("//", "");
-				URL url = this.getClass().getClassLoader().getResource(schemeSpecificPart);
+				URL url = this.getClass().getClassLoader().getResource(schemeSpecificPart);							
 				file = new File(UriUtils.urlToUri(url));
 			}
 			if (returnFile == false) {
 				//LOAD PROPERTIES FROM FILE
 				properties = loadPropertiesFromFile(file);
+				
 			} else {
-				return convertFileToString(file);
+				
+				String value = convertFileToString(file);
+				URI originalUri = (URI) parameters.get(MagicKey.ORIGINAL_URI);
+				URI locatedUri = this.uri;
+				parameters.put(MagicKey.RESOLVED_URI, locatedUri);
+				
+				property = new LocatedProperty(originalUri, locatedUri, value, this.getClass());
 			}
 
 		} catch (Throwable t) {
@@ -89,21 +99,34 @@ public class LocalLocation extends UriLocation {
 			LOG.trace("Searching for property:" + keyAsString);
 		}
 		// GET THE PROPERTY
+		String value = null;
 		value = properties.getProperty(keyAsString);
 
-		// IF WE GOT A VALUE, TRIM THE WHITESPACE
-		if (value != null) {
-			
-			value = value.trim();
-			if (LOG.isTraceEnabled()) {
-				LOG.trace("Found Property for URI:" + key + " at " + this.uri.toString() + " value of " + value);
+		// IF WE GOT A VALUE
+		URI originalUri = (URI) parameters.get(MagicKey.ORIGINAL_URI);
+		URI locatedUri = this.uri;
+		
+		if (property == null) {
+			if (value != null) {
+				parameters.put(MagicKey.RESOLVED_URI, locatedUri);
+				property = new LocatedProperty(originalUri, locatedUri, value.trim(), this.getClass());
+				
+				if (LOG.isDebugEnabled()) {
+					LOG.debug(property.toString());
+				}
+			} else {
+				property = new MissingProperty(originalUri, locatedUri, this.getClass());
+				
+				if (LOG.isTraceEnabled()) {
+					LOG.trace(property.toString());
+				}			
 			}
 		}
 		// QUICK CHECK TO RESET URI IF IT WAS DYNAMIC
 		if (useKeyAsUri) {
 			this.uri = null;
 		}
-		return value;
+		return property;
 	}
 
 	private String convertFileToString(File file) {
@@ -154,5 +177,19 @@ public class LocalLocation extends UriLocation {
 			supports = (uri.getScheme() == null) || ("file".equals(uri.getScheme())) || ("classpath".equals(uri.getScheme()));
 		} 
 		return supports;
+	}
+	
+	@Override
+	public String toString() {
+		
+		StringBuilder b = new StringBuilder();
+		
+		b.append(this.getClass().getName());
+		
+		if (this.uri != null) {
+			b.append(" for uri: ");
+			b.append(this.uri.toASCIIString());
+		}
+		return b.toString();
 	}
 }

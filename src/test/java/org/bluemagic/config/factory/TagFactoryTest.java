@@ -2,7 +2,6 @@ package org.bluemagic.config.factory;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.decorator.tags.SingleTag;
@@ -29,32 +28,14 @@ public class TagFactoryTest {
 	@Test
 	public void testBuildDoesNotExistClass() {
 		
-		Tag tag = null;
 		TagFactory tf = new TagFactory();
-		
-		try {
-			tag = tf.build("GoatCheese");
-			fail();
-		} catch (Throwable e) { 
-			assertTrue(e instanceof RuntimeException);
-		}
-		
-		assertNull(tag);
+		assertNull(tf.build("GoatCheese"));
 	}
 	
 	@Test
 	public void testBuildDoesNotExtendsTag() {
 		
-		Tag tag = null;
 		TagFactory tf = new TagFactory();
-		
-		try {
-			tag = tf.build("java.util.Properties");
-			fail();
-		} catch (Throwable e) { 
-			assertTrue(e instanceof RuntimeException);
-		}
-		
-		assertNull(tag);
+		assertNull(tf.build("java.util.Properties"));
 	}
 }

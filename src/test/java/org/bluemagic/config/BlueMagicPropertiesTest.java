@@ -35,18 +35,6 @@ public class BlueMagicPropertiesTest {
 	}
 	
 	@Test
-	public void prefixKeyCheck() {
-		BlueMagicProperties bmp = new BlueMagicProperties();
-		bmp.setKeyPrefix("jackster:rodr/");
-		
-		bmp.put("jackster:rodr/def", "123");
-		assertEquals("123", bmp.getProperty("def"));
-		
-		bmp.put("jackster:rodr/hokey", "yamble");
-		assertEquals("yamble", bmp.getProperty("hokey"));
-	}
-	
-	@Test
 	public void loadCannedProperties() {
 		
 		Properties bmp = new BlueMagicProperties("sample-magic-config.xml");

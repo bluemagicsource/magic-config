@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.MagicProperty;
 
 public class ChildUriLocation extends UriLocation {
 
@@ -11,7 +12,7 @@ public class ChildUriLocation extends UriLocation {
 		return true;
 	}
 
-	public String get(URI key, Map<MagicKey, Object> parameters) {
+	public MagicProperty locateHelper(URI key, Map<MagicKey, Object> parameters) {
 		return null;
 	}
 }

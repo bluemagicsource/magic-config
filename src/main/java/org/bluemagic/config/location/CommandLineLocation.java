@@ -3,15 +3,18 @@ package org.bluemagic.config.location;
 import java.net.URI;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.LocatedProperty;
+import org.bluemagic.config.api.property.MagicProperty;
+import org.bluemagic.config.api.property.MissingProperty;
 
 public class CommandLineLocation implements Location {
-
-	public String locate(URI key, Map<MagicKey, Object> parameters) {
-		return get(key, parameters);
-	}
 	
+	private static final Log LOG = LogFactory.getLog(CommandLineLocation.class);
+
 	/**
      * @param  key - URI a unique identifier for a specific instance of data
      *               or set of data.
@@ -29,9 +32,10 @@ public class CommandLineLocation implements Location {
      *                   the most it can return is an empty string because it is
      *                   not possible to pass null into the command line.
      **/ 
-	public String get(URI key, Map<MagicKey, Object> parameters) {
+	public MagicProperty locate(URI key, Map<MagicKey, Object> parameters) {
 
-		String rval = null;
+		String value = null;
+		MagicProperty property = null;
 		String keyAsString = key.toASCIIString();
 
 		if ((keyAsString != null) && (!keyAsString.trim().isEmpty())) {
@@ -41,10 +45,28 @@ public class CommandLineLocation implements Location {
 			// not going to occur. There is the case where the override can
 			// be to remove a property (aka the value is empty).
 			if (System.getProperties().containsKey(keyAsString)) {
-				rval = System.getProperty(keyAsString);
+				value = System.getProperty(keyAsString);
+			}
+			
+			URI originalUri = (URI) parameters.get(MagicKey.ORIGINAL_URI);
+			URI locatedUri = key;
+			
+			if (value != null) {
+				
+				parameters.put(MagicKey.RESOLVED_URI, key);
+				property = new LocatedProperty(originalUri, locatedUri, value, this.getClass());
+				
+				if (LOG.isDebugEnabled()) {
+					LOG.debug(property.toString());
+				}
+			} else {
+				property = new MissingProperty(originalUri, locatedUri, this.getClass());
+				if (LOG.isTraceEnabled()) {
+					LOG.trace(property.toString());
+				}
 			}
 		}
-		return rval;
+		return property;
 	}
 	
 	public boolean supports(URI key) {

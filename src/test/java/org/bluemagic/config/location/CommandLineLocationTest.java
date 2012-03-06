@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.LocatedProperty;
+import org.bluemagic.config.api.property.MagicProperty;
+import org.bluemagic.config.api.property.MissingProperty;
 import org.bluemagic.config.util.UriUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,9 +21,9 @@ public class CommandLineLocationTest {
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		Object rval = cldp.get(key, parameters);
+		MagicProperty rval = cldp.locate(key, parameters);
 
-		Assert.assertNull(rval);
+		Assert.assertTrue(rval instanceof MissingProperty);
 	}
 
 	@Test
@@ -32,10 +35,10 @@ public class CommandLineLocationTest {
 		System.setProperty("http://bluemagicsource.org/test", "");
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		Object rval = cldp.get(key, parameters);
+		MagicProperty rval = cldp.locate(key, parameters);
 
-		Assert.assertTrue(rval instanceof String);
-		Assert.assertTrue(((String) rval).isEmpty());
+		Assert.assertTrue(rval instanceof LocatedProperty);
+		Assert.assertTrue(((String) rval.getValue()).isEmpty());
 	}
 
 	@Test
@@ -47,10 +50,10 @@ public class CommandLineLocationTest {
 		System.setProperty("http://bluemagicsource.org/test", "success");
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		Object rval = cldp.get(key, parameters);
+		MagicProperty rval = cldp.locate(key, parameters);
 
-		Assert.assertTrue(rval instanceof String);
-		Assert.assertTrue(rval.equals(new String("success")));
+		Assert.assertTrue(rval instanceof LocatedProperty);
+		Assert.assertTrue(rval.getValue().equals(new String("success")));
 	}
 
 	@Test
@@ -63,9 +66,9 @@ public class CommandLineLocationTest {
 		System.setProperty("http://bluemagicsource.org/fail", "fail");
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		Object rval = cldp.get(key, parameters);
+		MagicProperty rval = cldp.locate(key, parameters);
 
-		Assert.assertTrue(rval instanceof String);
-		Assert.assertTrue(rval.equals(new String("success")));
+		Assert.assertTrue(rval instanceof LocatedProperty);
+		Assert.assertTrue(rval.getValue().equals(new String("success")));
 	}
 }

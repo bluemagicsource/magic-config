@@ -1,5 +1,7 @@
 package org.bluemagic.config.factory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Decorator.Method;
 import org.bluemagic.config.api.Tag;
@@ -11,6 +13,8 @@ import org.bluemagic.config.decorator.tags.SingleTag;
 import org.bluemagic.config.decorator.tags.TripleTag;
 
 public class DecoratorFactory {
+	
+	private static final Log LOG = LogFactory.getLog(DecoratorFactory.class);
 
 	public Decorator build(Tag tag, String method) {
 		
@@ -33,6 +37,9 @@ public class DecoratorFactory {
 			std.setTag(tag);
 			std.setMethod(getMethod(method));
 			decorator = std;
+		}
+		if (decorator != null) {
+			LOG.debug("Created decorator: " + decorator.toString());
 		}
 		return decorator;
 	}

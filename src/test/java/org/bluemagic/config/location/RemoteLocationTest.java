@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Decorator.Method;
+import org.bluemagic.config.api.property.MagicProperty;
+import org.bluemagic.config.api.property.MissingProperty;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.decorator.SingleTagDecorator;
 import org.bluemagic.config.decorator.tags.SingleTag;
@@ -33,7 +35,7 @@ public class RemoteLocationTest {
 		URI key = UriUtils.toUri("abc/def");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		String rval = rl.locate(key, parameters);
+		String rval = rl.locate(key, parameters).getValue().toString();
 		
 		System.out.println(rval);
 		Assert.assertEquals("shazam!", rval);
@@ -49,10 +51,8 @@ public class RemoteLocationTest {
 		URI key = UriUtils.toUri("abc/def");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		String rval = rl.locate(key, parameters);
-
-		System.out.println(rval);
-		Assert.assertNull(rval);
+		MagicProperty property = rl.locate(key, parameters);
+		Assert.assertTrue(property instanceof MissingProperty);
 	}
 	
 	@Test
@@ -73,10 +73,8 @@ public class RemoteLocationTest {
 		URI key = UriUtils.toUri("abc/def");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		String rval = rl.locate(key, parameters);
-
-		System.out.println(rval);
-		Assert.assertNull(rval);
+		MagicProperty property = rl.locate(key, parameters);
+		Assert.assertTrue(property instanceof MissingProperty);
 	}
 	
 	@Test
@@ -101,7 +99,7 @@ public class RemoteLocationTest {
 		URI key = UriUtils.toUri("abc/def");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		String rval = rl.locate(key, parameters);
+		String rval = rl.locate(key, parameters).getValue().toString();
 
 		System.out.println(rval);
 		Assert.assertEquals("huzzah!", rval);

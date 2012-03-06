@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.MagicProperty;
 
 public class KeyLocation implements Location {
 
@@ -13,21 +14,18 @@ public class KeyLocation implements Location {
 	private LocalLocation localLocation;
 	
 	private RemoteLocation remoteLocation;
-	
-	public String locate(URI key, Map<MagicKey, Object> parameters) {
-		return get(key, parameters);
-	}
 
-	public String get(URI key, Map<MagicKey, Object> parameters) {
+	
+	public MagicProperty locate(URI key, Map<MagicKey, Object> parameters) {
 
 		if (key.toASCIIString().startsWith("cmd:")) {
-			return commandlineLocation.get(key, parameters);
+			return commandlineLocation.locate(key, parameters);
 			
 		} else if (key.toASCIIString().startsWith("http")) {
-			return remoteLocation.get(key, parameters);
+			return remoteLocation.locateHelper(key, parameters);
 			
 		} else {
-			return getLocalLocation().get(key, parameters);
+			return getLocalLocation().locateHelper(key, parameters);
 		}
 	}
 	

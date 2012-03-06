@@ -7,7 +7,7 @@ import java.util.Map;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.decorator.tags.SingleTag;
-import org.bluemagic.config.util.UnsupportedTagException;
+import org.bluemagic.config.exception.UnsupportedTagException;
 import org.bluemagic.config.util.UriUtils;
 
 public class SingleTagDecorator extends TagDecorator {
@@ -29,11 +29,11 @@ public class SingleTagDecorator extends TagDecorator {
 		if ((tagsValue != null) && (tagsValue.length() > 0)) {
 			
 			// COMBINE THE CURRENT TAG WITH THE OTHERS
-			tagsValue = combineAndSortTags(this.getTag().getValue(), tagsValue, suffixSeperator);
+			tagsValue = combineAndSortTags(this.getTag().toString(), tagsValue, suffixSeperator);
 			
 		} else {
 			// THE ONLY SINGLETAG IS THE NEW ONE
-			tagsValue = getTag().getValue();
+			tagsValue = getTag().toString();
 		}
 		// COLLAPSE ADDING THE SINGLE TAGS WITH TAG PARAMETER KEY
 		return UriUtils.addParameterToUri(key, tagParameterKey, tagsValue);

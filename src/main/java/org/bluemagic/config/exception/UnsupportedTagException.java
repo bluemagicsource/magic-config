@@ -1,4 +1,4 @@
-package org.bluemagic.config.util;
+package org.bluemagic.config.exception;
 
 import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.decorator.TagDecorator;

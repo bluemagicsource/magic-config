@@ -6,7 +6,7 @@ import java.util.Map;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.decorator.tags.DoubleTag;
-import org.bluemagic.config.util.UnsupportedTagException;
+import org.bluemagic.config.exception.UnsupportedTagException;
 import org.bluemagic.config.util.UriUtils;
 
 public class DoubleTagDecorator extends TagDecorator {

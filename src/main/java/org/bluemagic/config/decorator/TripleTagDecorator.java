@@ -7,7 +7,7 @@ import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.decorator.tags.SingleTag;
 import org.bluemagic.config.decorator.tags.TripleTag;
-import org.bluemagic.config.util.UnsupportedTagException;
+import org.bluemagic.config.exception.UnsupportedTagException;
 import org.bluemagic.config.util.UriUtils;
 
 public class TripleTagDecorator extends TagDecorator {

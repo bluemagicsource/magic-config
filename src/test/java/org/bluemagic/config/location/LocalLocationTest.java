@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.MagicProperty;
 import org.bluemagic.config.util.UriUtils;
 import org.junit.Test;
 
@@ -20,16 +21,16 @@ public class LocalLocationTest {
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
 		ll.setUri(UriUtils.toUri("testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("nested/testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("nested/testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 	}	
 	
 	@Test
@@ -39,16 +40,16 @@ public class LocalLocationTest {
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
 		ll.setUri(UriUtils.toUri("classpath:testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("classpath://testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("classpath://nested/testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("classpath://nested/testProperties.xml"));
-		assertEquals("bar", ll.get(UriUtils.toUri("foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("foo"), parameters).getValue().toString());
 	}		
 	
 	@Test
@@ -58,16 +59,16 @@ public class LocalLocationTest {
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
 		ll.setUri(UriUtils.toUri("classpath:test.properties"));
-		assertEquals("123", ll.get(UriUtils.toUri("abc"), parameters));
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("abc"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("classpath://test.properties"));
-		assertEquals("123", ll.get(UriUtils.toUri("abc"), parameters));
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("abc"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("classpath://nested/test.properties"));
-		assertEquals("123", ll.get(UriUtils.toUri("abc"), parameters));
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("abc"), parameters).getValue().toString());
 		
 		ll.setUri(UriUtils.toUri("classpath://nested/test.properties"));
-		assertEquals("123", ll.get(UriUtils.toUri("abc"), parameters));
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("abc"), parameters).getValue().toString());
 	}
 	
 	@Test
@@ -76,11 +77,11 @@ public class LocalLocationTest {
 		LocalLocation ll = new LocalLocation();
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("bar", ll.get(UriUtils.toUri("classpath:testProperties.xml/foo"), parameters));
-		assertEquals("bar", ll.get(UriUtils.toUri("classpath://testProperties.xml/foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("classpath:testProperties.xml/foo"), parameters).getValue().toString());
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("classpath://testProperties.xml/foo"), parameters).getValue().toString());
 		
-		assertEquals("bar", ll.get(UriUtils.toUri("classpath:nested/testProperties.xml/foo"), parameters));
-		assertEquals("bar", ll.get(UriUtils.toUri("classpath://nested/testProperties.xml/foo"), parameters));
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("classpath:nested/testProperties.xml/foo"), parameters).getValue().toString());
+		assertEquals("bar", ll.locateHelper(UriUtils.toUri("classpath://nested/testProperties.xml/foo"), parameters).getValue().toString());
 	}	
 	
 	@Test
@@ -89,11 +90,11 @@ public class LocalLocationTest {
 		LocalLocation ll = new LocalLocation();
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 		
-		assertEquals("123", ll.get(UriUtils.toUri("classpath:test.properties/abc"), parameters));
-		assertEquals("123", ll.get(UriUtils.toUri("classpath://test.properties/abc"), parameters));
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("classpath:test.properties/abc"), parameters).getValue().toString());
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("classpath://test.properties/abc"), parameters).getValue().toString());
 		
-		assertEquals("123", ll.get(UriUtils.toUri("classpath:nested/test.properties/abc"), parameters));
-		assertEquals("123", ll.get(UriUtils.toUri("classpath://nested/test.properties/abc"), parameters));
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("classpath:nested/test.properties/abc"), parameters).getValue().toString());
+		assertEquals("123", ll.locateHelper(UriUtils.toUri("classpath://nested/test.properties/abc"), parameters).getValue().toString());
 	}	
 	
 	@Test
@@ -119,7 +120,7 @@ public class LocalLocationTest {
 		
 		LocalLocation ll = new LocalLocation();
 		
-		String string = ll.get(UriUtils.toUri("test.properties"), new HashMap<MagicKey,Object>());
-		assertEquals("abc=123", string.trim());
+		MagicProperty property = ll.locateHelper(UriUtils.toUri("test.properties"), new HashMap<MagicKey,Object>());
+		assertEquals("abc=123", property.getValue().toString().trim());
 	}
 }

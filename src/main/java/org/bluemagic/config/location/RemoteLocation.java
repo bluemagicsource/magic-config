@@ -10,6 +10,10 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.LocatedProperty;
+import org.bluemagic.config.api.property.MagicProperty;
+import org.bluemagic.config.api.property.MissingProperty;
+import org.bluemagic.config.api.property.UnavailableProperty;
 import org.bluemagic.config.location.remote.RestClientManager;
 import org.bluemagic.config.location.remote.SimpleRestClientManager;
 import org.bluemagic.config.util.UriUtils;
@@ -49,7 +53,11 @@ public class RemoteLocation extends UriLocation {
 	 * 
 	 * @ param searchCriteria - Not used by this implementation.
 	 **/
-	public String get(URI key, Map<MagicKey, Object> parameters) {
+	public MagicProperty locateHelper(URI key, Map<MagicKey, Object> parameters) {
+		
+		String value = null;
+		MagicProperty property = null;
+		
 		// Until we figure out how to initialize this automatically via xml,
 		// we should initialize it here.
 		init();
@@ -87,8 +95,32 @@ public class RemoteLocation extends UriLocation {
 				propertyUri = UriUtils.toUri(this.uri.toASCIIString());
 			}
 		}
+		URI originalUri = (URI) parameters.get(MagicKey.ORIGINAL_URI);
+		URI locatedUri = this.uri;
 		
-		return restClientManager.get(propertyUri);
+		try {
+			// ACTUALLY RETRIEVE THE VALUE FROM THE REST CLIENT
+			value = restClientManager.get(propertyUri);
+			
+			if (value != null) {
+				parameters.put(MagicKey.RESOLVED_URI, locatedUri);
+				property = new LocatedProperty(originalUri, locatedUri, value, this.getClass());
+				if (LOG.isDebugEnabled()) {
+					LOG.debug(property.toString());
+				}
+			} else {
+				property = new MissingProperty(originalUri, locatedUri, this.getClass());
+				if (LOG.isTraceEnabled()) {
+					LOG.trace(property.toString());
+				}
+			}
+		} catch (Throwable t) {
+			property = new UnavailableProperty(originalUri, locatedUri, this.getClass(), t);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace(property.toString());
+			}
+		}
+		return property;
 	}
 	
 	public Set<String> searchForKeys(URI baseUri) {

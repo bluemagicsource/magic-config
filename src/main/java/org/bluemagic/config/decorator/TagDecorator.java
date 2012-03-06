@@ -120,6 +120,18 @@ public abstract class TagDecorator implements Decorator {
 		// RETURN THE WHOLE VALUE
 		return b.toString();
 	}
+	
+	@Override
+	public String toString() {
+		
+		StringBuilder b = new StringBuilder();
+		
+		b.append(this.getClass().getName());
+		b.append(" with TAG: ");
+		b.append(tag.toString());
+		
+		return b.toString();
+	}
 
 	public abstract URI decorateSuffix(URI key, Map<MagicKey, Object> parameters);
 	

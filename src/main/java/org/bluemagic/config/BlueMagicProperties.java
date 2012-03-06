@@ -11,13 +11,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.CachedProperty;
+import org.bluemagic.config.api.property.DefaultProperty;
+import org.bluemagic.config.api.property.LocatedProperty;
+import org.bluemagic.config.api.property.MagicProperty;
 import org.bluemagic.config.factory.ConfigXmlParser;
 import org.bluemagic.config.factory.DecoratorFactory;
 import org.bluemagic.config.factory.LocationFactory;
 import org.bluemagic.config.factory.TagFactory;
 import org.bluemagic.config.factory.TransformerFactory;
 import org.bluemagic.config.location.LocalLocation;
-import org.bluemagic.config.util.DataNotFoundException;
 import org.bluemagic.config.util.UriUtils;
 
 /**
@@ -45,7 +48,7 @@ public class BlueMagicProperties extends Properties {
 	
 	private static final Log LOG = LogFactory.getLog(BlueMagicProperties.class);
 	
-	private String magicConfigFile = "magic-config.xml";
+	public static String DEFAULT_MAGIC_CONFIG_FILE = "magic-config.xml";
 	
 	private Collection<Location> magicConfigLocations;
 	
@@ -53,27 +56,23 @@ public class BlueMagicProperties extends Properties {
 	
 	private ConfigXmlParser xmlParser;
 	
-	private String keyPrefix = "";
-
-	// SET TO TRUE FOR NOW, BUT IS CONFIGURABLE
-	private boolean autoInitialize = true;
-
-	// STOPS NAGGING ABOUT INITIALIZATION
-	private boolean hasBeenWarned = false;
-	
-	public BlueMagicProperties() { }
+	public BlueMagicProperties() {	}
 	
 	public BlueMagicProperties(String magicConfigFile) {
-		this.magicConfigFile = magicConfigFile;
+		BlueMagicProperties.DEFAULT_MAGIC_CONFIG_FILE = magicConfigFile;
+		init();
 	}
 	
-	public void init() {
+	public boolean init() {
+		
+		boolean initialized = false;
+		
 		if (configLocations == null) {
 			
 			// DEFAULT TO MAGIC-CONFIG FILE
 			if (magicConfigLocations == null) {
 				magicConfigLocations = new ArrayList<Location>();
-				magicConfigLocations.add(new LocalLocation(getMagicConfigFile()));
+				magicConfigLocations.add(new LocalLocation(BlueMagicProperties.DEFAULT_MAGIC_CONFIG_FILE));
 			}
 			// BAREBONES INITIALIZATION
 			if (xmlParser == null) {
@@ -85,7 +84,11 @@ public class BlueMagicProperties extends Properties {
 			}
 			// BUILD THE CONFIG LOCATIONS FROM THE MAGIC-CONFIG
 			configLocations = xmlParser.buildLocations(magicConfigLocations);
+			if (configLocations != null) {
+				initialized = true; 
+			}
 		}
+		return initialized;
 	}
 
 	public synchronized Object get(Object key) {
@@ -101,9 +104,9 @@ public class BlueMagicProperties extends Properties {
 		// ONLY STRING KEYS ARE SUPPORTED AT THIS TIME
 		if (!(key instanceof String)) {
 			
-			String message = "Only java.util.String key values are supported at this time.";
+			String message = "Only " + String.class.getName() + " key values are supported at this time.";
 			LOG.error(message);
-			throw new RuntimeException(message);
+			throw new UnsupportedOperationException(message);
 		} else {
 			// GET THE VALUE SINCE IT IS A STRING
 			value = getProperty(key.toString()); 
@@ -114,7 +117,7 @@ public class BlueMagicProperties extends Properties {
 	public String getProperty(String keyAsString) {
 		
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
-		URI key = UriUtils.toUri(getKeyPrefix() + keyAsString);
+		URI key = UriUtils.toUri(keyAsString);
 
 		return getMagic(key, parameters);
 	}
@@ -122,7 +125,7 @@ public class BlueMagicProperties extends Properties {
 	public String getProperty(String keyAsString, String defaultValue) {
 		
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
-		URI key = UriUtils.toUri(getKeyPrefix() + keyAsString);
+		URI key = UriUtils.toUri(keyAsString);
 		parameters.put(MagicKey.DEFAULT_VALUE, defaultValue);
 		
 		return getMagic(key, parameters);
@@ -130,10 +133,7 @@ public class BlueMagicProperties extends Properties {
 	
 	public String getMagic(URI key, Map<MagicKey, Object> parameters) {
 		
-		String value = null;
-		
-		// CHECK TO SEE IF INITIALIZED
-		initializeCheck();
+		MagicProperty property = null;
 		
 		// IF NO PARAMETERS PASSED IN PREP IT FOR MAGIC FRAMEWORK
 		// DONT FORGET TO ADD IN THE ORIGINAL URI TO THE PARAMS
@@ -145,46 +145,43 @@ public class BlueMagicProperties extends Properties {
 		// CHECK IF THIS PROPERTY WAS ALREADY FOUND
         final Object ret = super.get(key.toASCIIString());
         if (ret != null) {
-            value = ret.toString();
+            property = new CachedProperty(key, ret.toString(), this.getClass());
         }
 		// THE CORE PART THAT CHECKS EACH LOCATION FOR PROPERTIES
-		if (value == null && configLocations != null) {
-			for (Location location : configLocations) {
+		if (!(property instanceof LocatedProperty)) {
+
+			// NEVER BEEN INITIALIZED
+			if (configLocations == null) {
+				init();
+			}
+			if (configLocations != null) {
 				
-				try {
+				for (Location location : configLocations) {
+					
 					if (location.supports(key)) {
-						value = location.locate(key, parameters);
+						
+						// LOCATE THE PROPERTY
+						property = location.locate(key, parameters);
 						
 						// CHECK TO SEE IF WE FOUND A VALUE
-						if (value != null) {
-						    super.put(key.toASCIIString(), value);
+						if (property instanceof LocatedProperty) {
+						    super.put(key.toASCIIString(), property.getValue());
 							break;
 						}
 					}
-				} catch (DataNotFoundException dnfe) {
-					dnfe.printStackTrace();
 				}
 			}
 		}
 		// CHECK THE DEFAULT VALUE, IF ONE PROVIDED
-		if (value == null) {
-			value = (String) parameters.get(MagicKey.DEFAULT_VALUE);
+		if (!(property instanceof LocatedProperty)) {
+			property = new DefaultProperty(key, parameters.get(MagicKey.DEFAULT_VALUE), this.getClass());
 		} else {
-			LOG.debug("Found property: " + key + " at location: " + parameters.get(MagicKey.RESOLVED_URI));
+			LOG.debug(property);
 		}
-		
-		return value;
-	}
-
-	private void initializeCheck() {
-		
-		if ((configLocations == null) && (!hasBeenWarned)) {
-			LOG.warn("BluemagicProperties was not initialized, please use init() method.");
-			hasBeenWarned = true;
-			
-			if (isAutoInitialize()) {
-				init();
-			}
+		if (property.getValue() != null) {
+			return property.getValue().toString();
+		} else {
+			return null;
 		}
 	}
 
@@ -204,22 +201,6 @@ public class BlueMagicProperties extends Properties {
 		return configLocations;
 	}
 
-	public void setKeyPrefix(String keyPrefix) {
-		this.keyPrefix = keyPrefix;
-	}
-
-	public String getKeyPrefix() {
-		return keyPrefix;
-	}
-
-	public void setAutoInitialize(boolean autoInitialize) {
-		this.autoInitialize = autoInitialize;
-	}
-
-	public boolean isAutoInitialize() {
-		return autoInitialize;
-	}
-
 	public Collection<Location> getMagicConfigLocations() {
 		return magicConfigLocations;
 	}
@@ -234,13 +215,5 @@ public class BlueMagicProperties extends Properties {
 
 	public void setXmlParser(ConfigXmlParser xmlParser) {
 		this.xmlParser = xmlParser;
-	}
-
-	public void setMagicConfigFile(String magicConfigFile) {
-		this.magicConfigFile = magicConfigFile;
-	}
-
-	public String getMagicConfigFile() {
-		return magicConfigFile;
 	}
 }

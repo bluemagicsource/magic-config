@@ -47,6 +47,7 @@
 					<decorator>
 						<!-- CHECK WITH CONFIGURATION SERVICE FOR TEST PROPERTY-->
 						<hashtag>#test</hashtag>
+						<doubleTag key="age">33</doubleTag>
 					</decorator>
 				</location>
 			</list>

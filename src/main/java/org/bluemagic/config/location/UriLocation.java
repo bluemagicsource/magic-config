@@ -10,6 +10,8 @@ import java.util.Map;
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
+import org.bluemagic.config.api.property.LocatedProperty;
+import org.bluemagic.config.api.property.MagicProperty;
 
 public abstract class UriLocation implements Location {
 	
@@ -17,10 +19,10 @@ public abstract class UriLocation implements Location {
 
 	protected URI uri;
 	
-	public String locate(URI key, Map<MagicKey, Object> parameters) {
+	public MagicProperty locate(URI key, Map<MagicKey, Object> parameters) {
 		
 		URI originalUri = this.uri;
-		String result = null;
+		MagicProperty property = null;
 		Collection<URI> decorated = new ArrayList<URI>();
 		
 		addOriginalURI(decorated, key);
@@ -34,14 +36,15 @@ public abstract class UriLocation implements Location {
 		
 		for (URI uri : decorated) {
 			this.uri = uri;
-			result = get(key, parameters);
+			property = locateHelper(key, parameters);
 			
-			if (result != null) {
+			if (property instanceof LocatedProperty) {
 				break;
 			}
 		}
 		this.uri = originalUri;
-		return result;
+		
+		return property;
 	}
 	
 	/**
@@ -83,8 +86,8 @@ public abstract class UriLocation implements Location {
 	protected void addOriginalURI(Collection<URI> decorated, URI key) {
 		decorated.add(this.uri);
 	}
-
-	public abstract String get(URI key, Map<MagicKey, Object> parameters);
+	
+	public abstract MagicProperty locateHelper(URI key, Map<MagicKey, Object> parameters);
 
 	public void setUri(URI uri) {
 		this.uri = uri;
