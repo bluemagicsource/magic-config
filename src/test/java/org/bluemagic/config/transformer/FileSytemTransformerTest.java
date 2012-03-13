@@ -1,8 +1,10 @@
 package org.bluemagic.config.transformer;
 //import junit.framework.TestCase;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.net.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,7 +30,8 @@ public class FileSytemTransformerTest{
 	@Before
 	public void generateTestData()
 	{
-		String tempTestFile = "testProperties_test.xml";
+		testFileName = "FileTransformer_Properties_test.xml";
+		String tempTestFile = "src"+File.separator+"test"+File.separator+"resources"+File.separator+testFileName;
 		
 		//Look into this an IO error here should shut down all tests
 		try
@@ -38,10 +41,9 @@ public class FileSytemTransformerTest{
 			{
 				F.delete();
 			}
-			F.createNewFile();			
-			testFilePath = F.getCanonicalPath();			
-			testFilePath = testFilePath.substring(0,testFilePath.lastIndexOf(File.separator));
-			testFileName = tempTestFile;
+			F.createNewFile();
+			testFilePath = tempTestFile;			
+			testFilePath = testFilePath.substring(0,testFilePath.lastIndexOf(File.separator));			
 			
 			
 		}
@@ -147,8 +149,9 @@ public class FileSytemTransformerTest{
 	@Test
 	public void testURIFileSetting()
 	{
-		try {
-			URI propertiesPath = new URI("file://"+testFilePath.replace('\\','/')+'/'+testFileName.replace('\\','/'));
+		try {			
+			
+			URI propertiesPath = new URI(("file://"+testFilePath.replace('\\','/')+'/'+testFileName.replace('\\','/')).replace(" ", "%20"));
 			String valueData = "";
 			Map<MagicKey, Object> testParameters =new HashMap<MagicKey, Object>();
 			FileSystemTransformer fsdt = new FileSystemTransformer();
