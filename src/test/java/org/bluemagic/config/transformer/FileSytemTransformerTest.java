@@ -4,7 +4,6 @@ package org.bluemagic.config.transformer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.net.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
