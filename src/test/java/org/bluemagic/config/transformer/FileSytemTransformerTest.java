@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /***
- * Junit test methods that test the FileTransformer class 
+ * JUnit test methods that test the FileTransformer class 
  * @author Peter James Platt
  *
  */
@@ -39,7 +39,6 @@ public class FileSytemTransformerTest{
 		testFileName = "FileTransformer_Properties_test.xml";
 		String tempTestFile = "src"+File.separator+"test"+File.separator+"resources"+File.separator+testFileName;
 		
-		//Look into this an IO error here should shut down all tests
 		try
 		{
 			File F = new File(tempTestFile);
@@ -49,8 +48,7 @@ public class FileSytemTransformerTest{
 			}
 			F.createNewFile();
 			testFilePath = tempTestFile;			
-			testFilePath = testFilePath.substring(0,testFilePath.lastIndexOf(File.separator));			
-			
+			testFilePath = testFilePath.substring(0,testFilePath.lastIndexOf(File.separator));		
 			
 		}
 		catch (Exception e)
@@ -90,7 +88,7 @@ public class FileSytemTransformerTest{
 		//Set Data object
 		valueData = "Noriega Chronicles";
 		//Set Test Filename
-		fsdt.setPropertiesFile(testFilePath+File.separator+"testPropertiesFile.xml");		
+		fsdt.setPropertiesFile(testFilePath+File.separator+testFileName);		
 		
 		assertEquals("Object Data will stay the same", valueData, fsdt.transform(valueData, testParameters));
 		
@@ -105,51 +103,43 @@ public class FileSytemTransformerTest{
 		Map<MagicKey, Object> testParameters =new HashMap<MagicKey, Object>();
 		FileSystemTransformer fsdt = new FileSystemTransformer();
 		
-		File f = new File(testFilePath+File.separator+"testPropertiesFile.xml");
-		if (!f.exists())
-		{
-			//Generates a properties file so it can be appended later
-			//Set testParameters
-			MagicKey key = MagicKey.ORIGINAL_URI;
-			testParameters.put(key, "http://www.tmpStudios.com/movies");
-			//Set Data object
-			valueData = "Noriega Chronicles";
-			//Set Test Filename
-			fsdt.setPropertiesFile(testFilePath+File.separator+"testPropertiesFile.xml");
-			
-			fsdt.transform(valueData, testParameters);
-			
-			if (!f.exists()){fail("No File Generated to append to");}
-		}
-		
+		//Generates first key value pair
+		File f = new File(testFilePath+File.separator+testFileName);
+		f.delete();
+		FileSystemTransformer fsdt_new = new FileSystemTransformer();
+		//Generates a properties file so it can be appended later
 		//Set testParameters
 		MagicKey key = MagicKey.ORIGINAL_URI;
-		testParameters.put(key, "http://www.tmpStudios.com/producer");
+		testParameters.put(key, "http://www.tmpStudios.com/movies");
+		//Set Data object
+		valueData = "Noriega Chronicles";
+		//Set Test Filename
+		fsdt_new.setPropertiesFile(testFilePath+File.separator+testFileName);
+			
+		fsdt_new.transform(valueData, testParameters);
+			
+		if (!f.exists()){fail("No File Generated to append to");}		
+		
+		//Generates Second Key Value Pair
+		MagicKey key2 = MagicKey.ORIGINAL_URI;
+		testParameters.put(key2, "http://www.tmpStudios.com/producer");
 		//Set Data object
 		valueData = "Peter Platt";		
 		
-		fsdt.setPropertiesFile(testFilePath+File.separator+"testPropertiesFile.xml");
+		fsdt.setPropertiesFile(testFilePath+File.separator+testFileName);
 		fsdt.transform(valueData, testParameters);
 		
+		//uses java properties reader to read the properties
 		Properties testProp = new Properties();
 		
 		FileInputStream xmlPropFileIn;
 		try {
-			xmlPropFileIn = new FileInputStream(testFilePath+File.separator+"testPropertiesFile.xml");
+			xmlPropFileIn = new FileInputStream(testFilePath+File.separator+testFileName);
 			testProp.loadFromXML(xmlPropFileIn);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail("Properties File not generated");
-		} catch (InvalidPropertiesFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail("Invalid Properties file generated");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail("IO errors occured");
-		}
+			
+		} catch (FileNotFoundException e) {	fail("Properties File not generated");
+		} catch (InvalidPropertiesFormatException e) {fail("Invalid Properties file generated");
+		} catch (IOException e) {fail("IO errors occured");	}
 		
 		String PropertyListingProducer = testProp.getProperty("http://www.tmpStudios.com/producer");
 		String PropertyListingMovies = testProp.getProperty("http://www.tmpStudios.com/movies");
@@ -195,7 +185,6 @@ public class FileSytemTransformerTest{
 		
 		File f2 = new File(testFilePath+File.separator+testFileName);
 		
-		if (f2.exists())			
-		{f2.delete();}
+	    if (f2.exists()){f2.delete();}
 	}
 }
