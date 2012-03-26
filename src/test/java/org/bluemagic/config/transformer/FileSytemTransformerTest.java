@@ -1,5 +1,5 @@
 package org.bluemagic.config.transformer;
-//import junit.framework.TestCase;
+
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -20,12 +20,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/***
+ * Junit test methods that test the FileTransformer class 
+ * @author Peter James Platt
+ *
+ */
 public class FileSytemTransformerTest{
 	
 	String testFileName;
 	String testFilePath;
 
-	
+	/***
+	 *Generates test data
+	 */
 	@Before
 	public void generateTestData()
 	{
@@ -55,7 +62,9 @@ public class FileSytemTransformerTest{
 	}
 
 	
-	//Tests is SetFile works properly
+	/***
+	 *Tests is SetFile works properly
+	 */
 	@Test
 	public void testSetFile()
 	{
@@ -66,7 +75,9 @@ public class FileSytemTransformerTest{
 		assertEquals("Tests if setFile method works",testFilePath+File.separator+testFileName,fsdt.getPropertiesFile());
 	}
 	
-	//Tests if Object Data actually changes 
+	/***
+	 *Tests if Object Data actually changes 
+	 */
 	@Test
 	public void testOjectChange(){
 		String valueData = "";
@@ -85,8 +96,9 @@ public class FileSytemTransformerTest{
 		
 	}
 	
-	//Tests if a properties file can be appended to 
-	//Note on refactor clean up the gen code
+	/***
+	 *Tests if a properties file can be appended to 
+	 */
 	@Test
 	public void testPropertiesAppend(){		
 		String valueData = "";
@@ -145,6 +157,9 @@ public class FileSytemTransformerTest{
 		assertEquals("Test if properties were added","Peter Platt_Noriega Chronicles",PropertyListingProducer+"_"+PropertyListingMovies);
 	}
 	
+	/***
+	 * Tests if setting the file by URI works
+	 */
 	@Test
 	public void testURIFileSetting()
 	{
@@ -171,15 +186,15 @@ public class FileSytemTransformerTest{
 	}
 	
 	
-	//probably a little sloppy here look into setting the f var to the other file
+	/***
+	 * Cleans up the test data
+	 */
 	@After
 	public void tossTestData()
 	{
-		File f = new File(testFileName);
-		if (f.exists())			
-		{f.delete();}
 		
-		File f2 = new File(testFilePath+File.separator+"testPropertiesFile.xml");
+		File f2 = new File(testFilePath+File.separator+testFileName);
+		
 		if (f2.exists())			
 		{f2.delete();}
 	}
