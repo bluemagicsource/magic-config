@@ -1,4 +1,6 @@
-package org.bluemagic.config.decorator.tags;
+package org.bluemagic.config.tags;
+
+import org.bluemagic.config.api.tag.SingleTag;
 
 /**
  * Implements the common username tags found on Twitter

@@ -1,7 +1,8 @@
-package org.bluemagic.config.decorator.tags;
+package org.bluemagic.config.tags;
 
 import static org.junit.Assert.assertEquals;
 
+import org.bluemagic.config.tags.UsernameTag;
 import org.junit.Test;
 
 public class UsernameTagTest {
