@@ -3,8 +3,8 @@ package org.bluemagic.config.factory;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.bluemagic.config.api.Tag;
-import org.bluemagic.config.decorator.tags.SingleTag;
+import org.bluemagic.config.api.tag.SingleTag;
+import org.bluemagic.config.api.tag.Tag;
 import org.junit.Test;
 
 public class TagFactoryTest {
@@ -21,8 +21,8 @@ public class TagFactoryTest {
 	public void testBuildSingleTagWithFullyQualifiedPackage() {
 		
 		TagFactory tf = new TagFactory();
-		assertTrue(tf.build("org.bluemagic.config.decorator.tags.SingleTag") instanceof SingleTag);
-		assertTrue(tf.build("org.bluemagic.config.decorator.tags.SingleTag") instanceof Tag);
+		assertTrue(tf.build("org.bluemagic.config.api.tag.SingleTag") instanceof SingleTag);
+		assertTrue(tf.build("org.bluemagic.config.api.tag.SingleTag") instanceof Tag);
 	}
 	
 	@Test

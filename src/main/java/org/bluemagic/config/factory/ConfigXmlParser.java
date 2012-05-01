@@ -17,12 +17,12 @@ import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.api.property.LocatedProperty;
 import org.bluemagic.config.api.property.MagicProperty;
-import org.bluemagic.config.decorator.tags.DoubleTag;
-import org.bluemagic.config.decorator.tags.SingleTag;
-import org.bluemagic.config.decorator.tags.TripleTag;
+import org.bluemagic.config.api.tag.DoubleTag;
+import org.bluemagic.config.api.tag.SingleTag;
+import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.MagicConfigParserException;
 import org.bluemagic.config.location.ChildUriLocation;
 import org.bluemagic.config.location.LocalLocation;
@@ -164,7 +164,7 @@ public class ConfigXmlParser {
 		}
 		if (rootLocation == null) {
 			// BIG PROBLEM IF WE CANT GET A TAG
-			throw new MagicConfigParserException("Could not find LOCATION class: " + locationClassName + "on classpath!");
+			throw new MagicConfigParserException("Could not find LOCATION class: " + locationClassName + " on classpath!");
 		}
 		
 		NodeList nl = n.getChildNodes();
@@ -248,7 +248,7 @@ public class ConfigXmlParser {
 		
 		if (tag == null) {
 			// BIG PROBLEM IF WE CANT GET A TAG
-			throw new MagicConfigParserException("Could not find TAG class: " + className + "on classpath!");
+			throw new MagicConfigParserException("Could not find TAG class: " + className + " on classpath!");
 		}
 		
 		if ((tag instanceof SingleTag) || (tag instanceof DoubleTag) || (tag instanceof TripleTag)) {

@@ -15,7 +15,7 @@ public class ReflectionUtils {
 			LOG.trace("Attempting to getClass of type: " + className);
 			clazz = Class.forName(className);
 			
-		} catch (ClassNotFoundException cnfe) { 
+		} catch (ClassNotFoundException cnfe) {
 			LOG.debug(cnfe);
 		}
 		return clazz;

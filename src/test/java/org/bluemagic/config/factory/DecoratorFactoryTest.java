@@ -3,12 +3,12 @@ package org.bluemagic.config.factory;
 import junit.framework.Assert;
 
 import org.bluemagic.config.api.Decorator;
+import org.bluemagic.config.api.tag.DoubleTag;
+import org.bluemagic.config.api.tag.SingleTag;
+import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.decorator.DoubleTagDecorator;
 import org.bluemagic.config.decorator.SingleTagDecorator;
 import org.bluemagic.config.decorator.TripleTagDecorator;
-import org.bluemagic.config.decorator.tags.DoubleTag;
-import org.bluemagic.config.decorator.tags.SingleTag;
-import org.bluemagic.config.decorator.tags.TripleTag;
 import org.junit.Test;
 
 public class DecoratorFactoryTest {

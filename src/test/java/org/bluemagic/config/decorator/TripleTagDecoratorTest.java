@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.decorator.tags.TripleTag;
+import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.util.UriUtils;
 import org.junit.Test;
 
