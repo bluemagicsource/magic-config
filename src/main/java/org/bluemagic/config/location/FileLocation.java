@@ -37,7 +37,6 @@ public class FileLocation extends RepositoryBackedLocation {
 			this.repository = new DirectoryRepository(this.folder, new TextFileRepository());
 		}
 		LOG.debug("Repository initialized with: " + this.repository.toString());
-		super.init();
 	}
 	
 	public boolean supports(URI key) {

@@ -10,16 +10,11 @@ import org.bluemagic.config.api.Repository;
 import org.bluemagic.config.api.property.LocatedProperty;
 import org.bluemagic.config.api.property.MissingProperty;
 
-
-public class RepositoryBackedLocation implements Location {
-	
-	protected boolean initialized = false;
+public abstract class RepositoryBackedLocation implements Location {
 
 	protected Repository repository;
 
-	public void init() {
-		initialized = true;
-	}
+	abstract protected void init();
 	
 	public boolean supports(URI key) {
 		return repository.supports(key);

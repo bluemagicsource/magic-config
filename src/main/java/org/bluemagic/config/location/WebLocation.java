@@ -1,7 +1,10 @@
 package org.bluemagic.config.location;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
+import java.net.URL;
 
 import org.bluemagic.config.repository.DirectoryRepository;
 import org.bluemagic.config.repository.file.PropertiesFileRepository;
@@ -17,8 +20,8 @@ public class WebLocation extends RepositoryBackedLocation {
 		
 		if (file != null) {
 			// GIVEN A REMOTE PROPERTIES FILE
-			File fileFromServer = getFileFromServer(file);
-			this.repository = new PropertiesFileRepository(fileFromServer);
+			Reader readerFromServer = getFileFromServer(file);
+			this.repository = new PropertiesFileRepository(readerFromServer);
 			
 		} else { 
 			
@@ -37,9 +40,20 @@ public class WebLocation extends RepositoryBackedLocation {
 		return (scheme.isEmpty()) || (scheme.startsWith("http")); 
 	}
 	
-	private File getFileFromServer(String file) {
-		// TODO Auto-generated method stub
-		return null;
+	private Reader getFileFromServer(String file) {
+		
+		Reader reader = null;
+		
+		try {
+			
+			URL url = new URL(file);
+			InputStream inputStream = url.openStream();
+			reader = new InputStreamReader(inputStream);
+			
+			return reader;
+		} catch (Throwable t) {
+			throw new RuntimeException(t.getMessage(), t);
+		}
 	}
 
 	public String getPrefix() {
