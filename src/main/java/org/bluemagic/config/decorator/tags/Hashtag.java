@@ -1,5 +1,7 @@
 package org.bluemagic.config.decorator.tags;
 
+import org.bluemagic.config.api.tag.SingleTag;
+
 /**
  * Implements the common hashtags found on Twitter
  * For example #RockyRoadIceCream or #test 
@@ -35,5 +37,20 @@ public class Hashtag extends SingleTag {
 		} else {
 			this.prefix = HASHTAG_PREFIX + prefix;
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	
+		boolean equals = false;
+		
+		if (obj instanceof Hashtag) {
+			Hashtag other = (Hashtag) obj;
+			
+			if (other.getValue().toLowerCase().equals(this.getValue().toLowerCase())) {
+				equals = true;
+			}
+		}
+		return equals;
 	}
 }

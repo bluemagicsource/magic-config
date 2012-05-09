@@ -1,13 +1,10 @@
 package org.bluemagic.config.factory;
 
 import java.net.URI;
-import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
-import org.bluemagic.config.location.UriLocation;
 import org.bluemagic.config.util.ReflectionUtils;
 import org.bluemagic.config.util.StringUtils;
 
@@ -16,6 +13,8 @@ public class LocationFactory {
 	private static final Log LOG = LogFactory.getLog(LocationFactory.class);
 	
 	public static String DEFAULT_LOCATION_PACKAGE_PREFIX = "org.bluemagic.config.location.";
+	
+	protected URI uri;
 	
 	public Location build(String className) {
 		
@@ -46,21 +45,18 @@ public class LocationFactory {
 		return location;
 	}
 
-	public UriLocation buildUriLocation(Location location, URI uri, Collection<Decorator> decorators) {
-
-		UriLocation uriLocation = null;
-		
-		// CHECK TO SEE IF ITS A URI LOCATION
-		if ((location != null) && (location instanceof UriLocation)) {
-			
-			// SAFELY CAST
-			uriLocation = (UriLocation) location;
-			
-			// SET ESSENTIAL ITEMS
-			uriLocation.setUri(uri);
-			uriLocation.setDecorators(decorators);
-			LOG.trace("Added " + decorators.size() + " decorators to UriLocation with uri: " + uri.toASCIIString());
-		}
-		return uriLocation;
-	}
+//	public Location buildDecoratedLocation(Location location, Collection<Decorator> decorators) {
+//
+//		DecoratingLocationWrapper dlw = new DecoratingLocationWrapper();
+//		
+//		// CHECK TO SEE IF ITS A URI LOCATION
+//		if (location != null) {
+//			
+//			// SET ESSENTIAL ITEMS
+//			dlw.setInternal(location);
+//			dlw.setDecorators(decorators);
+//			LOG.trace("Added " + decorators.size() + " decorators to Location");
+//		}
+//		return dlw;
+//	}
 }

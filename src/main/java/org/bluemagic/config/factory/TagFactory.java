@@ -2,7 +2,7 @@ package org.bluemagic.config.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.Tag;
+import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.util.ReflectionUtils;
 import org.bluemagic.config.util.StringUtils;
 

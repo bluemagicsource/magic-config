@@ -8,7 +8,7 @@
 		<location uri="local.properties.xml" />
 		
 		<!-- SEARCH FOR A BLUEMAGIC PROPERTIES FILE -->
-		<location uri="bluemagic.properties.xml">
+		<fileLocation file="bluemagic.properties.xml">
 			<location-chain>
 				<location>
 					<decorate method="prefix">
@@ -17,7 +17,7 @@
 					</decorate>
 				</location>
 			</location-chain>
-		</location>
+		</fileLocation>
 
 	</location-chain>
 	

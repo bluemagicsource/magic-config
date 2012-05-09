@@ -3,10 +3,10 @@ package org.bluemagic.config.location;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.property.LocatedProperty;
-import org.bluemagic.config.api.property.MagicProperty;
 import org.bluemagic.config.api.property.MissingProperty;
 import org.bluemagic.config.util.UriUtils;
 import org.junit.Assert;
@@ -21,7 +21,7 @@ public class CommandLineLocationTest {
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		MagicProperty rval = cldp.locate(key, parameters);
+		Entry<URI,Object> rval = cldp.locate(key, parameters);
 
 		Assert.assertTrue(rval instanceof MissingProperty);
 	}
@@ -35,7 +35,7 @@ public class CommandLineLocationTest {
 		System.setProperty("http://bluemagicsource.org/test", "");
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		MagicProperty rval = cldp.locate(key, parameters);
+		Entry<URI,Object> rval = cldp.locate(key, parameters);
 
 		Assert.assertTrue(rval instanceof LocatedProperty);
 		Assert.assertTrue(((String) rval.getValue()).isEmpty());
@@ -50,7 +50,7 @@ public class CommandLineLocationTest {
 		System.setProperty("http://bluemagicsource.org/test", "success");
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		MagicProperty rval = cldp.locate(key, parameters);
+		Entry<URI,Object> rval = cldp.locate(key, parameters);
 
 		Assert.assertTrue(rval instanceof LocatedProperty);
 		Assert.assertTrue(rval.getValue().equals(new String("success")));
@@ -66,7 +66,7 @@ public class CommandLineLocationTest {
 		System.setProperty("http://bluemagicsource.org/fail", "fail");
 
 		CommandLineLocation cldp = new CommandLineLocation();
-		MagicProperty rval = cldp.locate(key, parameters);
+		Entry<URI,Object> rval = cldp.locate(key, parameters);
 
 		Assert.assertTrue(rval instanceof LocatedProperty);
 		Assert.assertTrue(rval.getValue().equals(new String("success")));

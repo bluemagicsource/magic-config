@@ -9,7 +9,7 @@ import org.bluemagic.config.factory.DecoratorFactory;
 import org.bluemagic.config.factory.LocationFactory;
 import org.bluemagic.config.factory.TagFactory;
 import org.bluemagic.config.factory.TransformerFactory;
-import org.bluemagic.config.location.LocalLocation;
+import org.bluemagic.config.location.FileLocation;
 import org.junit.Test;
 
 public class PropertiesFactoryTest {
@@ -18,9 +18,9 @@ public class PropertiesFactoryTest {
 	public void buildLocation() {
 		Collection<Location> agentLocations = new ArrayList<Location>();
 		
-		LocalLocation localLocation = new LocalLocation();
-		localLocation.setUri(UriUtils.toUri("sample-agent.xml"));
-		agentLocations.add(localLocation);
+		FileLocation fileLocationOld = new FileLocation();
+		fileLocationOld.setFile("sample-agent.xml");
+		agentLocations.add(fileLocationOld);
 		
 		ConfigXmlParser configXmlParser = new ConfigXmlParser();
 		configXmlParser.setDecoratorFactory(new DecoratorFactory());

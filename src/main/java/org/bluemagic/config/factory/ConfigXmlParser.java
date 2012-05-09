@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,15 +18,15 @@ import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.api.Tag;
 import org.bluemagic.config.api.property.LocatedProperty;
-import org.bluemagic.config.api.property.MagicProperty;
-import org.bluemagic.config.decorator.tags.DoubleTag;
-import org.bluemagic.config.decorator.tags.SingleTag;
-import org.bluemagic.config.decorator.tags.TripleTag;
+import org.bluemagic.config.api.tag.DoubleTag;
+import org.bluemagic.config.api.tag.SingleTag;
+import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.MagicConfigParserException;
-import org.bluemagic.config.location.ChildUriLocation;
-import org.bluemagic.config.location.LocalLocation;
+import org.bluemagic.config.location.DecoratingLocationWrapper;
+import org.bluemagic.config.location.FileLocation;
+import org.bluemagic.config.repository.file.TextFileRepository;
 import org.bluemagic.config.util.StringUtils;
 import org.bluemagic.config.util.UriUtils;
 import org.w3c.dom.Document;
@@ -52,15 +53,15 @@ public class ConfigXmlParser {
 		
 		for (Location location : agentLocations) {
 			
-			if (location instanceof LocalLocation) {
+			if (location instanceof FileLocation) {
 				
-				LocalLocation local = (LocalLocation) location;
-				URI key = local.getUri();
-				local.setUri(null);
+				FileLocation local = (FileLocation) location;
+				URI key = UriUtils.toUri(local.getFile());
+				local.setRepository(new TextFileRepository());
 				Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
 				
 				parameters.put(MagicKey.ORIGINAL_URI, key);
-				MagicProperty property = local.locate(key, parameters);
+				Entry<URI,Object> property = local.locate(key, parameters);
 				
 				if ((property instanceof LocatedProperty) && (!property.getValue().toString().isEmpty())) {
 					return parse(property.getValue().toString());
@@ -151,17 +152,18 @@ public class ConfigXmlParser {
 		String nodeName = n.getNodeName();
 		
 		if ("location".equals(nodeName)) {
-			nodeName = "childUriLocation";
+			nodeName = "decoratingLocationWrapper";
 		}
 		String locationClassName = nodeName;
 		rootLocation = locationFactory.build(locationClassName);
 		
-		Node uriNode = n.getAttributes().getNamedItem("uri");
-		if (uriNode != null) {
-			String uriAsString = uriNode.getNodeValue();
-			URI uri = UriUtils.toUri(uriAsString);
-			rootLocation = locationFactory.buildUriLocation(rootLocation, uri, decorators);
+		NamedNodeMap attributes = n.getAttributes();
+		for (int i = 0; i < attributes.getLength(); i++) {
+			String key = attributes.item(i).getNodeName();
+			String value = attributes.item(i).getNodeValue();
+			callSetterMethod(rootLocation, key, value);
 		}
+		
 		if (rootLocation == null) {
 			// BIG PROBLEM IF WE CANT GET A TAG
 			throw new MagicConfigParserException("Could not find LOCATION class: " + locationClassName + "on classpath!");
@@ -182,32 +184,23 @@ public class ConfigXmlParser {
 						
 						for (Location l : subLocations) {
 							
-							if (l instanceof ChildUriLocation) {
-								ChildUriLocation cul = (ChildUriLocation) l;
-								Location subLocation = null;
+							if (l instanceof DecoratingLocationWrapper) {
 								
-								if (cul.getUri() == null) {
-									String uriAsString = null;
-									uriNode = n.getAttributes().getNamedItem("uri");
-									
-									if (uriNode != null) {
-										uriAsString = uriNode.getNodeValue();
-									}
-									String subLocationClassName = rootLocation.getClass().getName();
-									subLocation = locationFactory.build(subLocationClassName);
-									subLocation = locationFactory.buildUriLocation(subLocation, UriUtils.toUri(uriAsString), cul.getDecorators());
-									
-									if (subLocation == null) {
-										// BIG PROBLEM IF WE CANT GET A TAG
-										throw new MagicConfigParserException("Could not find LOCATION class: " + subLocationClassName + "on classpath!");
-									}
-								}
-								locations.add(subLocation);
+								DecoratingLocationWrapper dlw = (DecoratingLocationWrapper) l;
+								dlw.setDecorators(decorators);
+								dlw.setInternal(rootLocation);
+								
+								locations.add(dlw);
 							}
 						}
 					}
 					if ("decorator".equals(nodeName)) {
 						decorators.addAll(parseDecorator(node));
+					}
+					if (rootLocation instanceof DecoratingLocationWrapper) {
+						
+						DecoratingLocationWrapper dlw = (DecoratingLocationWrapper) rootLocation;
+						dlw.setDecorators(decorators);
 					}
 				}
 			}

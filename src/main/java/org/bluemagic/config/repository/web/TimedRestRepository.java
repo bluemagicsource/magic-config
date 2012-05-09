@@ -1,23 +1,19 @@
-package org.bluemagic.config.location.remote;
+package org.bluemagic.config.repository.web;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class TimedRestClientManager implements RestClientManager {
+public class TimedRestRepository extends WebRepository {
 	
 	private long timeoutInMillis = 1000;
 	
-	private RestClientManager internalRestClientManager;
+	private WebRepository internalWebRepository;
 
-	public String post(URI uri, Map<String, String> parameters) {
-		throw new UnsupportedOperationException();
-	}
-
+	@Override
 	public String get(URI uri) {
 		
 		RestfulGetCallable getCallable = new RestfulGetCallable(uri);
@@ -33,22 +29,6 @@ public class TimedRestClientManager implements RestClientManager {
 		return getCallable.result;
 	}
 
-	public String update(URI uri, Map<String, String> parameters) {
-		throw new UnsupportedOperationException();
-	}
-
-	public String delete(URI uri) {
-		throw new UnsupportedOperationException();
-	}
-
-	public void setInternalRestClientManager(RestClientManager internalRestClientManager) {
-		this.internalRestClientManager = internalRestClientManager;
-	}
-
-	public RestClientManager getInternalRestClientManager() {
-		return internalRestClientManager;
-	}
-	
 	public void setTimeoutInMillis(long timeoutInMillis) {
 		this.timeoutInMillis = timeoutInMillis;
 	}
@@ -76,8 +56,32 @@ public class TimedRestClientManager implements RestClientManager {
 		}
 
 		public String call() throws Exception {
-			result = internalRestClientManager.get(getUri());
+			result = internalWebRepository.get(getUri()).toString();
 			return result;
 		}
+	}
+
+	@Override
+	public Object put(URI key, Object value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object remove(URI key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int size() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.api.Tag;
-import org.bluemagic.config.decorator.tags.SingleTag;
-import org.bluemagic.config.decorator.tags.TripleTag;
+import org.bluemagic.config.api.tag.SingleTag;
+import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.UnsupportedTagException;
 import org.bluemagic.config.util.UriUtils;
 

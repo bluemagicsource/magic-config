@@ -1,8 +1,8 @@
-package org.bluemagic.config.location.remote;
+package org.bluemagic.config.repository.web;
 
 import java.net.URI;
 
-public class SecureRestClientManager extends SimpleRestClientManager {
+public class SecureRestClientManager extends SimpleRestRepository {
 
 	@Override
 	public String get(URI uri) {

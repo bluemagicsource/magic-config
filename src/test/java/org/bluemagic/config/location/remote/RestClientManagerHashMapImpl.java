@@ -2,9 +2,8 @@ package org.bluemagic.config.location.remote;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Map;
 
-import org.bluemagic.config.location.remote.RestClientManager;
+import org.bluemagic.config.repository.web.WebRepository;
 
 /**
  * A simple RestClientManager that uses a HashMap to store the values.  This way we can test
@@ -15,7 +14,7 @@ import org.bluemagic.config.location.remote.RestClientManager;
  * @author Sean Dobberstein
  *
  */
-public class RestClientManagerHashMapImpl implements RestClientManager {
+public class RestClientManagerHashMapImpl extends WebRepository {
 
 	public static final String URL = "http://www.xyz.com/magic/property/";
 	public static final String DATA = "Property-Data";
@@ -26,15 +25,15 @@ public class RestClientManagerHashMapImpl implements RestClientManager {
 		propertyMap = new HashMap<String, String>();
 	}
 	
-	@Override
-	public String post(URI uri, Map<String, String> parameters) {
-		if (parameters.containsKey(DATA)) {
-			propertyMap.put(uri.toASCIIString(), parameters.get(DATA));
-			return propertyMap.get(DATA);
-		} else {
-			throw new RuntimeException("Property-Data is required!");
-		}
-	}
+//	@Override
+//	public String post(URI uri, Map<String, String> parameters) {
+//		if (parameters.containsKey(DATA)) {
+//			propertyMap.put(uri.toASCIIString(), parameters.get(DATA));
+//			return propertyMap.get(DATA);
+//		} else {
+//			throw new RuntimeException("Property-Data is required!");
+//		}
+//	}
 
 	@Override
 	public String get(URI uri) {
@@ -51,14 +50,38 @@ public class RestClientManagerHashMapImpl implements RestClientManager {
 		return null;
 	}
 
+//	@Override
+//	public String update(URI uri, Map<String, String> parameters) {
+//		throw new UnsupportedOperationException();
+//	}
+//
+//	@Override
+//	public String delete(URI uri) {
+//		return propertyMap.remove(uri.toASCIIString());
+//	}
+
 	@Override
-	public String update(URI uri, Map<String, String> parameters) {
-		throw new UnsupportedOperationException();
+	public Object put(URI key, Object value) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public String delete(URI uri) {
-		return propertyMap.remove(uri.toASCIIString());
+	public Object remove(URI key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int size() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

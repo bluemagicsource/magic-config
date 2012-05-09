@@ -1,6 +1,6 @@
 package org.bluemagic.config.exception;
 
-import org.bluemagic.config.api.Tag;
+import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.decorator.TagDecorator;
 
 public class UnsupportedTagException extends RuntimeException {

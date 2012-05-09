@@ -41,6 +41,9 @@ public class BlueMagicPropertiesTest {
 		Object foo = bmp.get("foo");
 		System.out.println("\n\nfoo=" + foo.toString());
 		
+		foo = bmp.get("jammin");
+		System.out.println("\n\njammin=" + foo.toString());
+		
 		//foo = bmp.get("fu");
 		//System.out.println("fu=" + foo.toString());
 	}

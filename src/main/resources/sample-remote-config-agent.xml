@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <magic-config>
 
-	<import uri="https://configprops.com/service/?.agent.xml" user="application" password="secret">
+	<import file="https://configprops.com/service/?.agent.xml" user="application" password="secret">
 		<decorate method="placeholder" replace="?">
 			<!-- CHECK WITH CONFIGURATION SERVICE FOR CURRENT VERSION -->
 			<hostnameTag />

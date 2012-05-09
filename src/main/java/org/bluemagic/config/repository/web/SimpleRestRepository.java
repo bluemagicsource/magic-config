@@ -1,23 +1,19 @@
-package org.bluemagic.config.location.remote;
+package org.bluemagic.config.repository.web;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SimpleRestClientManager implements RestClientManager {
+public class SimpleRestRepository extends WebRepository {
 	
-	private static final Log LOG = LogFactory.getLog(SimpleRestClientManager.class);
+	private static final Log LOG = LogFactory.getLog(SimpleRestRepository.class);
 
-	public String post(URI uri, Map<String, String> parameters) {
-		throw new UnsupportedOperationException();
-	}
-
+	@Override
 	public String get(URI uri) {
 		
 		URL url = null;
@@ -86,11 +82,19 @@ public class SimpleRestClientManager implements RestClientManager {
 		return rval;
 	}
 
-	public String update(URI uri, Map<String, String> parameters) {
+	public Object put(URI key, Object value) {
 		throw new UnsupportedOperationException();
 	}
 
-	public String delete(URI uri) {
+	public Object remove(URI key) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void clear() {
+		throw new UnsupportedOperationException();
+	}
+
+	public int size() {
 		throw new UnsupportedOperationException();
 	}
 }

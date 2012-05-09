@@ -1,20 +1,10 @@
 package org.bluemagic.config.factory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bluemagic.config.api.Decorator;
-import org.bluemagic.config.api.Location;
-import org.bluemagic.config.location.LocalLocation;
-import org.bluemagic.config.location.RemoteLocation;
-import org.bluemagic.config.location.UriLocation;
-import org.bluemagic.config.util.UriUtils;
+import org.bluemagic.config.location.FileLocation;
+import org.bluemagic.config.location.WebLocation;
 import org.junit.Test;
 
 public class LocationFactoryTest {
@@ -23,14 +13,14 @@ public class LocationFactoryTest {
 	public void testBuildLocalLocation() {
 		
 		LocationFactory lf = new LocationFactory();
-		assertTrue(lf.build("localLocation") instanceof LocalLocation);
+		assertTrue(lf.build("fileLocation") instanceof FileLocation);
 	}
 	
 	@Test
 	public void testBuildRemoteLocationWithFullyQualifiedPackage() {
 		
 		LocationFactory lf = new LocationFactory();
-		assertTrue(lf.build("org.bluemagic.config.location.RemoteLocation") instanceof RemoteLocation);
+		assertTrue(lf.build("org.bluemagic.config.location.WebLocation") instanceof WebLocation);
 	}
 	
 	@Test
@@ -46,20 +36,19 @@ public class LocationFactoryTest {
 		LocationFactory lf = new LocationFactory();
 		assertNull(lf.build("java.util.Properties"));
 	}
-	
-	@Test
-	public void testBuildUriLocation() {
-		
-		LocationFactory lf = new LocationFactory();
-		
-		Location location = new LocalLocation();
-		URI uri = UriUtils.toUri("abc");
-		List<Decorator> decoratorList = new ArrayList<Decorator>();
-		
-		UriLocation uriLocation = lf.buildUriLocation(location, uri, decoratorList);
-		
-		assertNotNull(uriLocation);
-		assertEquals(uri, uriLocation.getUri());
-		assertEquals(decoratorList, uriLocation.getDecorators());
-	}
+//	
+//	@Test
+//	public void testBuildUriLocation() {
+//		
+//		LocationFactory lf = new LocationFactory();
+//		
+//		Location location = new FileLocationOld();
+//		List<Decorator> decoratorList = new ArrayList<Decorator>();
+//		
+//		Location uriLocation = lf.buildDecoratedLocation(location, decoratorList);
+//		
+//		assertTrue(uriLocation instanceof DecoratingLocationWrapper);
+//		assertEquals(location, ((DecoratingLocationWrapper) uriLocation).getInternal());
+//		assertEquals(decoratorList, ((DecoratingLocationWrapper) uriLocation).getDecorators());
+//	}
 }

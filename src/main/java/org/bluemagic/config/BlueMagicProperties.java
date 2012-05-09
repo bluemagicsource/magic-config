@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -14,13 +15,12 @@ import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.property.CachedProperty;
 import org.bluemagic.config.api.property.DefaultProperty;
 import org.bluemagic.config.api.property.LocatedProperty;
-import org.bluemagic.config.api.property.MagicProperty;
 import org.bluemagic.config.factory.ConfigXmlParser;
 import org.bluemagic.config.factory.DecoratorFactory;
 import org.bluemagic.config.factory.LocationFactory;
 import org.bluemagic.config.factory.TagFactory;
 import org.bluemagic.config.factory.TransformerFactory;
-import org.bluemagic.config.location.LocalLocation;
+import org.bluemagic.config.location.FileLocation;
 import org.bluemagic.config.util.UriUtils;
 
 /**
@@ -72,7 +72,9 @@ public class BlueMagicProperties extends Properties {
 			// DEFAULT TO MAGIC-CONFIG FILE
 			if (magicConfigLocations == null) {
 				magicConfigLocations = new ArrayList<Location>();
-				magicConfigLocations.add(new LocalLocation(BlueMagicProperties.DEFAULT_MAGIC_CONFIG_FILE));
+				FileLocation fileLocation = new FileLocation();
+				fileLocation.setFile(BlueMagicProperties.DEFAULT_MAGIC_CONFIG_FILE);
+				magicConfigLocations.add(fileLocation);
 			}
 			// BAREBONES INITIALIZATION
 			if (xmlParser == null) {
@@ -133,7 +135,7 @@ public class BlueMagicProperties extends Properties {
 	
 	public String getMagic(URI key, Map<MagicKey, Object> parameters) {
 		
-		MagicProperty property = null;
+		Entry<URI,Object> property = null;
 		
 		// IF NO PARAMETERS PASSED IN PREP IT FOR MAGIC FRAMEWORK
 		// DONT FORGET TO ADD IN THE ORIGINAL URI TO THE PARAMS
@@ -145,7 +147,7 @@ public class BlueMagicProperties extends Properties {
 		// CHECK IF THIS PROPERTY WAS ALREADY FOUND
         final Object ret = super.get(key.toASCIIString());
         if (ret != null) {
-            property = new CachedProperty(key, ret.toString(), this.getClass());
+            property = new CachedProperty(key, key, ret.toString(), this.getClass());
         }
 		// THE CORE PART THAT CHECKS EACH LOCATION FOR PROPERTIES
 		if (!(property instanceof LocatedProperty)) {
@@ -174,7 +176,7 @@ public class BlueMagicProperties extends Properties {
 		}
 		// CHECK THE DEFAULT VALUE, IF ONE PROVIDED
 		if (!(property instanceof LocatedProperty)) {
-			property = new DefaultProperty(key, parameters.get(MagicKey.DEFAULT_VALUE), this.getClass());
+			property = new DefaultProperty(key, key, parameters.get(MagicKey.DEFAULT_VALUE), this.getClass());
 		} else {
 			LOG.debug(property);
 		}

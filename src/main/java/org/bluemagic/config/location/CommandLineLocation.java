@@ -2,13 +2,13 @@ package org.bluemagic.config.location;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.property.LocatedProperty;
-import org.bluemagic.config.api.property.MagicProperty;
 import org.bluemagic.config.api.property.MissingProperty;
 
 public class CommandLineLocation implements Location {
@@ -32,10 +32,10 @@ public class CommandLineLocation implements Location {
      *                   the most it can return is an empty string because it is
      *                   not possible to pass null into the command line.
      **/ 
-	public MagicProperty locate(URI key, Map<MagicKey, Object> parameters) {
+	public Entry<URI,Object> locate(URI key, Map<MagicKey, Object> parameters) {
 
 		String value = null;
-		MagicProperty property = null;
+		Entry<URI,Object> property = null;
 		String keyAsString = key.toASCIIString();
 
 		if ((keyAsString != null) && (!keyAsString.trim().isEmpty())) {
@@ -71,5 +71,15 @@ public class CommandLineLocation implements Location {
 	
 	public boolean supports(URI key) {
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		
+		StringBuilder b = new StringBuilder();
+
+		b.append(this.getClass().getName());
+		
+		return b.toString();
 	}
 }

@@ -21,4 +21,16 @@ public class HashtagTest {
 		htag.setValue("abc");
 		assertEquals(Hashtag.HASHTAG_PREFIX + "abc", htag.toString());
 	}
+	
+	@Test
+	public void checkEquals() {
+		
+		Hashtag htag1 = new Hashtag();
+		htag1.setValue("#UpperCase");
+		
+		Hashtag htag2 = new Hashtag();
+		htag2.setValue("#uppercase");
+		
+		assertEquals(htag1, htag2);
+	}
 }

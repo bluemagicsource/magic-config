@@ -2,6 +2,8 @@ package org.bluemagic.config.decorator.tags;
 
 import java.net.InetAddress;
 
+import org.bluemagic.config.api.tag.SingleTag;
+
 public class HostnameTag extends SingleTag {
 
 	@Override

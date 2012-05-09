@@ -8,18 +8,18 @@
 	<list>
 	
 		<!-- SEARCH FOR A LOCAL PROPERTIES FILE -->
-		<location uri="local.properties.xml" />
+		<fileLocation file="local.properties.xml" />
 		
-		<localLocation uri="bluemagic.properties.xml">
+		<fileLocation file="bluemagic.properties.xml">
 			<decorator method="prefix">
 				<!-- CHECK HOST SPECIFIC FILE -->
 				<hostnameTag />
 			</decorator>
-		</localLocation>
+		</fileLocation>
 		
 		<location class="com.beakbox.core.location.MyLocation" /> 
 		
-		<remoteLocation user="application" password="secret">
+		<webLocation prefix="http://configprops.com/property/" user="application" password="secret">
 			<decorator>
 				<!-- CHECK WITH CONFIGURATION SERVICE FOR CURRENT VERSION -->
 				<hashtag>#1.0-SNAPSHOT</hashtag>
@@ -51,10 +51,10 @@
 					</decorator>
 				</location>
 			</list>
-		</remoteLocation>
+		</webLocation>
 		
 		<!-- CHECK FOR PROPERTY IN PERSISTED FILE (LAST DITCH EFFORT) -->
-		<location uri="persisted.properties.xml" />
+		<fileLocation file="persisted.properties.xml" />
 		
 	</list>
 	
