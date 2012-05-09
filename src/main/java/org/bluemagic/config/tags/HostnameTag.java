@@ -1,4 +1,4 @@
-package org.bluemagic.config.decorator.tags;
+package org.bluemagic.config.tags;
 
 import java.net.InetAddress;
 

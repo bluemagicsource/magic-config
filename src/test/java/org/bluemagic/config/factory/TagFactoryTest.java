@@ -21,8 +21,8 @@ public class TagFactoryTest {
 	public void testBuildSingleTagWithFullyQualifiedPackage() {
 		
 		TagFactory tf = new TagFactory();
-		assertTrue(tf.build("org.bluemagic.config.decorator.tags.SingleTag") instanceof SingleTag);
-		assertTrue(tf.build("org.bluemagic.config.decorator.tags.SingleTag") instanceof Tag);
+		assertTrue(tf.build("org.bluemagic.config.api.tag.SingleTag") instanceof SingleTag);
+		assertTrue(tf.build("org.bluemagic.config.api.tag.SingleTag") instanceof Tag);
 	}
 	
 	@Test

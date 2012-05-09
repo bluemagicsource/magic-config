@@ -10,21 +10,30 @@ public class TagFactory {
 	
 	private static final Log LOG = LogFactory.getLog(TagFactory.class);
 
-	public static String DEFAULT_TAG_PREFIX = "org.bluemagic.config.decorator.tags.";
+	public static String API_TAG_PREFIX = "org.bluemagic.config.api.tag.";
+	public static String CONFIG_TAG_PREFIX = "org.bluemagic.config.tags.";
 	
 	public Tag build(String className) {
+		String originalClassName = className;
 		
 		Tag tag = null;
 		Class<?> clazz = null;
 		Object instance = null;
 		
-		// 	TRY GETTING CLASS WITHOUT ADDING DEFAULT PACKAGE
-		clazz = ReflectionUtils.classFromName(className);
+		// 	TRY GETTING CLASS WITHOUT ADDING API PACKAGE
+		clazz = ReflectionUtils.classFromName(originalClassName);
 		
 		if (clazz == null) {
-			className = TagFactory.DEFAULT_TAG_PREFIX + StringUtils.capitalize(className);
+			className = TagFactory.API_TAG_PREFIX + StringUtils.capitalize(originalClassName);
 			
-			// 	TRY GETTING CLASS AFTER ADDING DEFAULT PACKAGE
+			// 	TRY GETTING CLASS AFTER ADDING API PACKAGE
+			clazz = ReflectionUtils.classFromName(className);
+		}
+		
+		if (clazz == null) {
+            className = TagFactory.CONFIG_TAG_PREFIX + StringUtils.capitalize(originalClassName);
+			
+			// 	TRY GETTING CLASS AFTER ADDING CONFIG PACKAGE
 			clazz = ReflectionUtils.classFromName(className);
 		}
 		
@@ -38,6 +47,7 @@ public class TagFactory {
 			tag = (Tag) instance;
 			LOG.debug("Created: " + tag.toString() + " as instanceof: " + clazz.getName());
 		}
+		
 		return tag;
 	}
 }
