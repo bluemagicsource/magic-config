@@ -44,7 +44,7 @@ public class FileLocation extends RepositoryBackedLocation {
 		
 		boolean supports = false;
 
-		if ((key != null) && ("file".equals(key.getScheme()) || ("classpath".equals(key.getScheme())) || ("".equals(key.getScheme())))) {
+		if ((key != null) && ("file".equals(key.getScheme()) || ("classpath".equals(key.getScheme())) || ("".equals(key.getScheme()) || (key.getScheme() == null)))) {
 			supports = true;
 		}
 		return supports;

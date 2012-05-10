@@ -21,6 +21,7 @@ import org.bluemagic.config.factory.LocationFactory;
 import org.bluemagic.config.factory.TagFactory;
 import org.bluemagic.config.factory.TransformerFactory;
 import org.bluemagic.config.location.FileLocation;
+import org.bluemagic.config.repository.file.TextFileRepository;
 import org.bluemagic.config.util.UriUtils;
 
 /**

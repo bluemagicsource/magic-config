@@ -3,6 +3,7 @@ package org.bluemagic.config.repository.file;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.net.URI;
 
@@ -36,6 +37,28 @@ public class TextFileRepository extends FileRepository {
 			
 			// Close the input stream
 			fstream.close();
+		} catch (FileNotFoundException fnf) {
+			
+			try {
+				URI uri = this.getClass().getClassLoader().getResource(key.toASCIIString()).toURI();
+				File file = new File(uri);
+				FileInputStream fstream = new FileInputStream(file);
+				
+				// Get the object of DataInputStream
+				BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+				String strLine;
+
+				// Read File Line By Line
+				while ((strLine = br.readLine()) != null) {
+					// Print the content on the console
+					b.append(strLine);
+				}
+				value = b.toString().trim();
+				
+				// Close the input stream
+				fstream.close();
+				
+			} catch (Exception e) { }
 			
 		} catch (Exception e) {// Catch exception if any
 			System.err.println("Error: " + e.getMessage());
