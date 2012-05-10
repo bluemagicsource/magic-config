@@ -10,16 +10,11 @@ import org.bluemagic.config.api.Repository;
 import org.bluemagic.config.api.property.LocatedProperty;
 import org.bluemagic.config.api.property.MissingProperty;
 
-
-public class RepositoryBackedLocation implements Location {
-	
-	protected boolean initialized = false;
+public abstract class RepositoryBackedLocation implements Location {
 
 	protected Repository repository;
 
-	public void init() {
-		initialized = true;
-	}
+	abstract protected void init();
 	
 	public boolean supports(URI key) {
 		return repository.supports(key);
@@ -34,7 +29,7 @@ public class RepositoryBackedLocation implements Location {
 		}
 		
 		// DELEGATE TO A REPOSITORY FOR PROPERTIES
-		Object object = this.repository.get(key);
+		Object object = getPropertyFromRepository(key);
 		
 		if (object != null) {
 			property = new LocatedProperty((URI) parameters.get(MagicKey.ORIGINAL_URI), key, object, this.getClass());
@@ -42,6 +37,10 @@ public class RepositoryBackedLocation implements Location {
 			property = new MissingProperty((URI) parameters.get(MagicKey.ORIGINAL_URI), key, this.getClass());
 		}
 		return property;
+	}
+	
+	public Object getPropertyFromRepository(URI key) {
+		return this.repository.get(key);
 	}
 
 	public Repository getRepository() {

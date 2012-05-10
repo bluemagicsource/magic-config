@@ -1,11 +1,14 @@
 package org.bluemagic.config.location;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
+import java.net.URL;
 
-import org.bluemagic.config.repository.DirectoryRepository;
 import org.bluemagic.config.repository.file.PropertiesFileRepository;
-import org.bluemagic.config.repository.web.SimpleRestRepository;
+import org.bluemagic.config.repository.web.RemoteFileRepository;
+import org.bluemagic.config.util.UriUtils;
 
 public class WebLocation extends RepositoryBackedLocation {
 	
@@ -17,18 +20,36 @@ public class WebLocation extends RepositoryBackedLocation {
 		
 		if (file != null) {
 			// GIVEN A REMOTE PROPERTIES FILE
-			File fileFromServer = getFileFromServer(file);
-			this.repository = new PropertiesFileRepository(fileFromServer);
+			Reader readerFromServer = getFileFromServer(file);
+			this.repository = new PropertiesFileRepository(readerFromServer);
 			
 		} else { 
 			
-			// IF NO PATH SPECIFIED THEN PREFIX WITH EMPTY PATH
-			if (prefix == null) {
-				prefix = "";
-			}
-			// GIVEN A PREFIX OF THE URL
-			this.repository = new DirectoryRepository(prefix, new SimpleRestRepository());
+			this.repository = new RemoteFileRepository();
 		}
+	}
+	
+	@Override
+	public Object getPropertyFromRepository(URI key) {
+		
+		String originalKey = key.toString();
+		String normalizedKey = null;
+		
+		if (prefix != null) {
+			
+			// CHECK TO SEE IF THE PREFIX IS IN THE KEY ALREADY
+			// IF IT IS, THEN NO NEED TO APPEND THE PREFIX
+			
+			if (!originalKey.startsWith(prefix)) {
+				normalizedKey = prefix + originalKey;
+			} else {
+				normalizedKey = originalKey;
+			}
+		} else {
+			normalizedKey = originalKey;
+		}
+		
+		return this.repository.get(UriUtils.toUri(normalizedKey));
 	}
 	
 	public boolean supports(URI key) {
@@ -37,9 +58,20 @@ public class WebLocation extends RepositoryBackedLocation {
 		return (scheme.isEmpty()) || (scheme.startsWith("http")); 
 	}
 	
-	private File getFileFromServer(String file) {
-		// TODO Auto-generated method stub
-		return null;
+	private Reader getFileFromServer(String file) {
+		
+		Reader reader = null;
+		
+		try {
+			
+			URL url = new URL(file);
+			InputStream inputStream = url.openStream();
+			reader = new InputStreamReader(inputStream);
+			
+			return reader;
+		} catch (Throwable t) {
+			throw new RuntimeException(t.getMessage(), t);
+		}
 	}
 
 	public String getPrefix() {
