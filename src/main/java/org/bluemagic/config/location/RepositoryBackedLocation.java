@@ -29,7 +29,7 @@ public abstract class RepositoryBackedLocation implements Location {
 		}
 		
 		// DELEGATE TO A REPOSITORY FOR PROPERTIES
-		Object object = this.repository.get(key);
+		Object object = getPropertyFromRepository(key);
 		
 		if (object != null) {
 			property = new LocatedProperty((URI) parameters.get(MagicKey.ORIGINAL_URI), key, object, this.getClass());
@@ -37,6 +37,10 @@ public abstract class RepositoryBackedLocation implements Location {
 			property = new MissingProperty((URI) parameters.get(MagicKey.ORIGINAL_URI), key, this.getClass());
 		}
 		return property;
+	}
+	
+	public Object getPropertyFromRepository(URI key) {
+		return this.repository.get(key);
 	}
 
 	public Repository getRepository() {
