@@ -1,4 +1,5 @@
 <!--
+	SVN TEST
 	This pom has been formatted to run for Maven 3.0.1 and above. To run
 	formatting checks with checkstyle, cobertura, jalopy, javadocs, and
 	surefire reports, first run mvn clean install. Then run mvn site. To
