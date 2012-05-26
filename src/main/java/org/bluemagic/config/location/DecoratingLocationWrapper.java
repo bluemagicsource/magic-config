@@ -75,6 +75,10 @@ public class DecoratingLocationWrapper implements Location {
 	
 	@Override
 	public Encoding getEncoding() {
+		
+		if (internal == null) {
+			return Encoding.NONE;
+		}
 		return internal.getEncoding();
 	}
 
