@@ -75,7 +75,7 @@ public class DecoratingLocationWrapper implements Location {
 	
 	@Override
 	public Encoding getEncoding() {
-		return Tag.Encoding.NONE;
+		return internal.getEncoding();
 	}
 
 	public void setDecorators(Collection<Decorator> decorators) {
