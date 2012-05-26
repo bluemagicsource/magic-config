@@ -10,6 +10,8 @@ import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.property.LocatedProperty;
 import org.bluemagic.config.api.property.MissingProperty;
+import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.Tag.Encoding;
 
 public class CommandLineLocation implements Location {
 	
@@ -81,5 +83,10 @@ public class CommandLineLocation implements Location {
 		b.append(this.getClass().getName());
 		
 		return b.toString();
+	}
+	
+	@Override
+	public Encoding getEncoding() {
+		return Tag.Encoding.NONE;
 	}
 }

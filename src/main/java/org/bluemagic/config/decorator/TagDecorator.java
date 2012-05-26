@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.util.UriUtils;
 
 public abstract class TagDecorator implements Decorator {
@@ -23,6 +24,8 @@ public abstract class TagDecorator implements Decorator {
 	private String placeholder = "?";
 	
 	private Method method;
+	
+	private Encoding encoding;
 	
 	private Tag tag;
 	
@@ -65,7 +68,7 @@ public abstract class TagDecorator implements Decorator {
 		u.append(split[0]);
 		
 		// THESE ARE THE TAGS
-		u.append(combineAndSortTags(tag.toString(), split[1], prefixSeparator));
+		u.append(combineAndSortTags(tag.toString(encoding), split[1], prefixSeparator));
 		
 		// ADD SEPARATOR 
 		u.append(prefixSeparator);
@@ -136,7 +139,7 @@ public abstract class TagDecorator implements Decorator {
 	public abstract URI decorateSuffix(URI key, Map<MagicKey, Object> parameters);
 	
 	public abstract boolean supports(Tag tag);
-
+	
 	public String getPrefixSeparator() {
 		return prefixSeparator;
 	}
@@ -175,5 +178,13 @@ public abstract class TagDecorator implements Decorator {
 
 	public void setTag(Tag tag) {
 		this.tag = tag;
+	}
+
+	public Encoding getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(Encoding encoding) {
+		this.encoding = encoding;
 	}
 }

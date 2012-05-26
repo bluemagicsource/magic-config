@@ -23,6 +23,7 @@ import org.bluemagic.config.api.property.LocatedProperty;
 import org.bluemagic.config.api.tag.DoubleTag;
 import org.bluemagic.config.api.tag.SingleTag;
 import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.MagicConfigParserException;
 import org.bluemagic.config.location.DecoratingLocationWrapper;
@@ -196,7 +197,7 @@ public class ConfigXmlParser {
 						}
 					}
 					if ("decorator".equals(nodeName)) {
-						decorators.addAll(parseDecorator(node));
+						decorators.addAll(parseDecorator(node, rootLocation.getEncoding()));
 					}
 					if (rootLocation instanceof DecoratingLocationWrapper) {
 						
@@ -211,7 +212,7 @@ public class ConfigXmlParser {
 		return locations;	
 	}
 
-	private Collection<Decorator> parseDecorator(Node n) {
+	private Collection<Decorator> parseDecorator(Node n, Encoding encoding) {
 		
 		LOG.trace("Encountered XML: " + n.getNodeName());
 		Collection<Decorator> decorators = new ArrayList<Decorator>();
@@ -226,14 +227,15 @@ public class ConfigXmlParser {
 				String nodeName = node.getNodeName();
 				
 				if (!nodeName.startsWith("#")) {
-					decorators.add(parseTag(node, method));
+					Decorator decorator = parseTag(node, method, encoding);
+					decorators.add(decorator);
 				}
 			}
 		}
 		return decorators;
 	}
 
-	private Decorator parseTag(final Node n, String method) {
+	private Decorator parseTag(final Node n, String method, Encoding encoding) {
 
 		LOG.trace("Encountered XML: " + n.getNodeName());
 		String className = n.getNodeName();
@@ -257,7 +259,7 @@ public class ConfigXmlParser {
 			String value = attributes.item(i).getNodeValue();
 			callSetterMethod(tag, key, value);
 		}
-		Decorator decorator = decoratorFactory.build(tag, method);
+		Decorator decorator = decoratorFactory.build(tag, method, encoding);
 		
 		if (decorator == null) {
 			throw new MagicConfigParserException("Could not create a DECORATOR for TAG: " + tag.toString() + "!");

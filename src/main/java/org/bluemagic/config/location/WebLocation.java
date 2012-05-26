@@ -6,6 +6,8 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
 
+import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.repository.file.PropertiesFileRepository;
 import org.bluemagic.config.repository.web.RemoteFileRepository;
 import org.bluemagic.config.util.UriUtils;
@@ -72,6 +74,11 @@ public class WebLocation extends RepositoryBackedLocation {
 		} catch (Throwable t) {
 			throw new RuntimeException(t.getMessage(), t);
 		}
+	}
+	
+	@Override
+	public Encoding getEncoding() {
+		return Tag.Encoding.NONE;
 	}
 
 	public String getPrefix() {

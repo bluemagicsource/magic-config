@@ -16,7 +16,7 @@ public class DoubleTagDecorator extends TagDecorator {
 		DoubleTag doubleTag = (DoubleTag) getTag();
 		
 		// ADD PARAMETER TO THE URI
-		return UriUtils.addParameterToUri(key, doubleTag.getKey(), doubleTag.getValue());
+		return UriUtils.addParameterToUri(key, doubleTag.encodeString(doubleTag.getKey(), getEncoding()), doubleTag.encodeString(doubleTag.getValue(), getEncoding()));
 	}
 	
 	public boolean supports(Tag tag) {

@@ -8,10 +8,43 @@ import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.tag.SingleTag;
+import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.util.UriUtils;
 import org.junit.Test;
 
 public class SingleTagDecoratorTest {
+	
+	@Test
+	public void simpleDecoratePrefixUrl() {
+		
+		SingleTag singleTag = new SingleTag();
+		singleTag.setValue("my Tag");
+		
+		SingleTagDecorator std = new SingleTagDecorator();
+		std.setEncoding(Encoding.WEB);
+		std.setTag(singleTag);
+		
+		URI key = UriUtils.toUri("abc");
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		
+		assertEquals("my+Tag.abc", std.decoratePrefix(key, parameters).toASCIIString());
+	}
+	
+	@Test
+	public void simpleDecoratePrefixUrlCrazy() {
+		
+		SingleTag singleTag = new SingleTag();
+		singleTag.setValue("http://www.google.com");
+		
+		SingleTagDecorator std = new SingleTagDecorator();
+		std.setTag(singleTag);
+		std.setEncoding(Encoding.WEB);
+		
+		URI key = UriUtils.toUri("abc");
+		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
+		
+		assertEquals("http%3A%2F%2Fwww.google.com.abc", std.decoratePrefix(key, parameters).toASCIIString());
+	}
 	
 	@Test
 	public void simpleDecoratePrefix() {

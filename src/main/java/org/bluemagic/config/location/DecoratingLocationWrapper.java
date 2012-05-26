@@ -12,6 +12,8 @@ import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.property.LocatedProperty;
+import org.bluemagic.config.api.tag.Tag;
+import org.bluemagic.config.api.tag.Tag.Encoding;
 
 public class DecoratingLocationWrapper implements Location {
 
@@ -69,6 +71,11 @@ public class DecoratingLocationWrapper implements Location {
 			b.append(" decorators");
 		}
 		return b.toString();
+	}
+	
+	@Override
+	public Encoding getEncoding() {
+		return Tag.Encoding.NONE;
 	}
 
 	public void setDecorators(Collection<Decorator> decorators) {

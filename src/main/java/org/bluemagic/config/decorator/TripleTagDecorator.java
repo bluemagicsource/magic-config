@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.api.tag.SingleTag;
 import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.UnsupportedTagException;
@@ -17,7 +16,7 @@ public class TripleTagDecorator extends TagDecorator {
 		TripleTag tripleTag = (TripleTag) getTag();
 		
 		// ADD PARAMETER TO THE URI
-		return UriUtils.addParameterToUri(key, tripleTag.getNamespace() + tripleTag.getNameSpacePredicateSeparator() + tripleTag.getPredicate(), tripleTag.getValue());
+		return UriUtils.addParameterToUri(key, tripleTag.encodeString(tripleTag.getNamespace() + tripleTag.getNameSpacePredicateSeparator() + tripleTag.getPredicate(), getEncoding()), tripleTag.encodeString(tripleTag.getValue(), getEncoding()));
 	}
 	
 	public boolean supports(Tag tag) {
@@ -25,7 +24,7 @@ public class TripleTagDecorator extends TagDecorator {
 		boolean supports = false;
 		
 		// CHECK TYPE OF TAG
-		if (tag instanceof SingleTag) {
+		if (tag instanceof TripleTag) {
 			supports = true;
 		}
 		return supports;
