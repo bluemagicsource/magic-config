@@ -189,16 +189,17 @@ public class ConfigXmlParser {
 							if (l instanceof DecoratingLocationWrapper) {
 								
 								DecoratingLocationWrapper dlw = (DecoratingLocationWrapper) l;
-								dlw.setDecorators(decorators);
 								dlw.setInternal(rootLocation);
 								
 								locations.add(dlw);
 							}
 						}
 					}
+					
 					if ("decorator".equals(nodeName)) {
 						decorators.addAll(parseDecorator(node, rootLocation.getEncoding()));
 					}
+					
 					if (rootLocation instanceof DecoratingLocationWrapper) {
 						
 						DecoratingLocationWrapper dlw = (DecoratingLocationWrapper) rootLocation;

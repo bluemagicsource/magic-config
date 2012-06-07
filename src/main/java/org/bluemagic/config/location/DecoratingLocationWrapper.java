@@ -12,7 +12,6 @@ import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.property.LocatedProperty;
-import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.api.tag.Tag.Encoding;
 
 public class DecoratingLocationWrapper implements Location {
