@@ -47,7 +47,7 @@ public class LocationFactory {
 
 //	public Location buildDecoratedLocation(Location location, Collection<Decorator> decorators) {
 //
-//		DecoratingLocationWrapper dlw = new DecoratingLocationWrapper();
+//		KeyDecoratingLocationWrapper dlw = new KeyDecoratingLocationWrapper();
 //		
 //		// CHECK TO SEE IF ITS A URI LOCATION
 //		if (location != null) {

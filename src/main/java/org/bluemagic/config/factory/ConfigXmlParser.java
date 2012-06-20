@@ -26,7 +26,7 @@ import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.MagicConfigParserException;
-import org.bluemagic.config.location.DecoratingLocationWrapper;
+import org.bluemagic.config.location.KeyDecoratingLocationWrapper;
 import org.bluemagic.config.location.FileLocation;
 import org.bluemagic.config.repository.file.TextFileRepository;
 import org.bluemagic.config.util.StringUtils;
@@ -186,9 +186,9 @@ public class ConfigXmlParser {
 						
 						for (Location l : subLocations) {
 							
-							if (l instanceof DecoratingLocationWrapper) {
+							if (l instanceof KeyDecoratingLocationWrapper) {
 								
-								DecoratingLocationWrapper dlw = (DecoratingLocationWrapper) l;
+								KeyDecoratingLocationWrapper dlw = (KeyDecoratingLocationWrapper) l;
 								dlw.setDecorators(decorators);
 								dlw.setInternal(rootLocation);
 								
@@ -199,9 +199,9 @@ public class ConfigXmlParser {
 					if ("decorator".equals(nodeName)) {
 						decorators.addAll(parseDecorator(node, rootLocation.getEncoding()));
 					}
-					if (rootLocation instanceof DecoratingLocationWrapper) {
+					if (rootLocation instanceof KeyDecoratingLocationWrapper) {
 						
-						DecoratingLocationWrapper dlw = (DecoratingLocationWrapper) rootLocation;
+						KeyDecoratingLocationWrapper dlw = (KeyDecoratingLocationWrapper) rootLocation;
 						dlw.setDecorators(decorators);
 					}
 				}

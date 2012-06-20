@@ -47,8 +47,8 @@ public class LocationFactoryTest {
 //		
 //		Location uriLocation = lf.buildDecoratedLocation(location, decoratorList);
 //		
-//		assertTrue(uriLocation instanceof DecoratingLocationWrapper);
-//		assertEquals(location, ((DecoratingLocationWrapper) uriLocation).getInternal());
-//		assertEquals(decoratorList, ((DecoratingLocationWrapper) uriLocation).getDecorators());
+//		assertTrue(uriLocation instanceof KeyDecoratingLocationWrapper);
+//		assertEquals(location, ((KeyDecoratingLocationWrapper) uriLocation).getInternal());
+//		assertEquals(decoratorList, ((KeyDecoratingLocationWrapper) uriLocation).getDecorators());
 //	}
 }
