@@ -19,15 +19,14 @@ import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.property.LocatedProperty;
-
 import org.bluemagic.config.api.tag.DoubleTag;
 import org.bluemagic.config.api.tag.SingleTag;
 import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.MagicConfigParserException;
-import org.bluemagic.config.location.KeyDecoratingLocationWrapper;
 import org.bluemagic.config.location.FileLocation;
+import org.bluemagic.config.location.KeyDecoratingLocationWrapper;
 import org.bluemagic.config.repository.file.TextFileRepository;
 import org.bluemagic.config.util.StringUtils;
 import org.bluemagic.config.util.UriUtils;
@@ -187,7 +186,7 @@ public class ConfigXmlParser {
 						for (Location l : subLocations) {
 							
 							if (l instanceof KeyDecoratingLocationWrapper) {
-								
+
 								KeyDecoratingLocationWrapper dlw = (KeyDecoratingLocationWrapper) l;
 								dlw.setDecorators(decorators);
 								dlw.setInternal(rootLocation);
@@ -196,11 +195,13 @@ public class ConfigXmlParser {
 							}
 						}
 					}
+					
 					if ("decorator".equals(nodeName)) {
 						decorators.addAll(parseDecorator(node, rootLocation.getEncoding()));
 					}
+
 					if (rootLocation instanceof KeyDecoratingLocationWrapper) {
-						
+
 						KeyDecoratingLocationWrapper dlw = (KeyDecoratingLocationWrapper) rootLocation;
 						dlw.setDecorators(decorators);
 					}

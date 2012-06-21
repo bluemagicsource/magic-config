@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="foo">tonn</entry>
+<entry key="fu">baz</entry>
+<entry key="decorated">abc-decorator</entry>
+</properties>
