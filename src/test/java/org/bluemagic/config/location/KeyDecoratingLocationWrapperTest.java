@@ -21,7 +21,7 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DecoratingLocationWrapperTest {
+public class KeyDecoratingLocationWrapperTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -38,7 +38,7 @@ public class DecoratingLocationWrapperTest {
 		decorator.setTag(tag);
 		decorators.add(decorator);
 		
-		DecoratingLocationWrapper dlw = new DecoratingLocationWrapper();
+		KeyDecoratingLocationWrapper dlw = new KeyDecoratingLocationWrapper();
 		dlw.setDecorators(decorators);
 		dlw.setInternal(mockLocation);
 		
@@ -67,7 +67,7 @@ public class DecoratingLocationWrapperTest {
 		decorator.setTag(tag);
 		decorators.add(decorator);
 		
-		DecoratingLocationWrapper dlw = new DecoratingLocationWrapper();
+		KeyDecoratingLocationWrapper dlw = new KeyDecoratingLocationWrapper();
 		dlw.setDecorators(decorators);
 		dlw.setInternal(mockLocation);
 		
