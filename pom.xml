@@ -36,11 +36,6 @@
 
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
-		    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-		    <version>1.2.14</version>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.7</version>
@@ -82,7 +77,7 @@
 						<Spring-Context>osgi.xml</Spring-Context>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Export-Package>org.bluemagic.config</Export-Package>
-						<Import-Package>org.bluemagic.config.api,!org.apache.commons.logging,!javax.servlet,!org.apache.avalon.framework.logger,!org.apache.log,!org.apache.log4j,!javax.xml.parsers,!org.w3c.dom,!org.xml.sax</Import-Package>
+						<Import-Package>org.bluemagic.config.api,!javax.servlet,!org.apache.avalon.framework.logger,!org.apache.log,!org.apache.log4j,!javax.xml.parsers,!org.w3c.dom</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
