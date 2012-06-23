@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -68,7 +69,7 @@ public abstract class TagDecorator implements Decorator {
 		u.append(split[0]);
 		
 		// THESE ARE THE TAGS
-		u.append(combineAndSortTags(tag.toString(encoding), split[1], prefixSeparator));
+		u.append(combineTagsAsPrefix(tag.toString(encoding), split[1], prefixSeparator));
 		
 		// ADD SEPARATOR 
 		u.append(prefixSeparator);
@@ -101,7 +102,15 @@ public abstract class TagDecorator implements Decorator {
 	public String combineAndSortTags(String addMe, String tagsValue, String separator) {
 		
 		StringBuilder b = new StringBuilder();
-		Set<String> uniqueTags = new TreeSet<String>(Arrays.asList(tagsValue.split(separator)));
+		List<String> asList = new ArrayList<String>();
+		
+		if (tagsValue.contains(separator)) {
+			asList = Arrays.asList(tagsValue.split(separator));
+		} else {
+			asList.add(tagsValue);
+		}
+		
+		Set<String> uniqueTags = new TreeSet<String>(asList);
 		uniqueTags.remove("");
 		
 		// ADD THE NEW TAG
@@ -117,6 +126,45 @@ public abstract class TagDecorator implements Decorator {
 			
 			// CHECK TO SEE IF WE NEED TO ADD A SEPARATOR
 			if (tagIterator.hasNext()) {
+				b.append(separator);
+			}
+		}
+		// RETURN THE WHOLE VALUE
+		return b.toString();
+	}
+	
+	public String combineTagsAsPrefix(String addMe, String tagsValue, String separator) {
+		
+		StringBuilder b = new StringBuilder();
+		List<String> allTags = new ArrayList<String>();
+		
+		if (tagsValue.contains(separator)) {
+			
+			String splitPrefix = "";
+			
+			if (".".equals(separator)) {
+				// SPECIAL CASE SO WE CAN ESCAPE THE PERIOD BECAUSE IT IS A REGEX
+				splitPrefix = "\\";
+			}
+			allTags.addAll(Arrays.asList(tagsValue.split(splitPrefix + separator)));
+			
+		} else {
+			allTags.add(tagsValue);
+		}
+		
+		// ADD THE NEW TAG
+		allTags.add(addMe);
+		
+		allTags.remove("");
+		
+		// ITERATE OVER THE TAGS CREATING THE VALUE
+		for (int count = 0; count < allTags.size(); count++) {
+		
+			// APPEND THE TAG VALUE
+			b.append(allTags.get(count));
+			
+			// CHECK TO SEE IF WE NEED TO ADD A SEPARATOR
+			if (count < (allTags.size() - 1)) {
 				b.append(separator);
 			}
 		}

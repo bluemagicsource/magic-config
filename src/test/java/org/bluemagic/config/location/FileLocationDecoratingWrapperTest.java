@@ -52,7 +52,7 @@ public class FileLocationDecoratingWrapperTest {
 	 * Will find "foo" in abc.testProperties.xml
 	 */
 	@Test
-	public void testOneDecorators() {
+	public void testOnePrefixLocationDecorator() {
 		
 		Collection<Decorator> decorators = new ArrayList<Decorator>();
 		SingleTag tag01 = new SingleTag("abc");
@@ -67,57 +67,20 @@ public class FileLocationDecoratingWrapperTest {
 		
 		System.out.println(wrapper.getLocations());
 		Assert.assertEquals("tonn", value);
-		Assert.assertEquals(2, wrapper.getLocations().size());
+		Assert.assertEquals(1, wrapper.getLocations().size());
 		
 		FileLocation location01 = (FileLocation) wrapper.getLocations().get(0);
 		Assert.assertEquals("abc.testProperties.xml", location01.getFile());
-		
-		FileLocation location02 = (FileLocation) wrapper.getLocations().get(1);
-		Assert.assertEquals("testProperties.xml", location02.getFile());
 	}
 	
 	/*
 	 * Will check:
-	 * - abc.testProperties.xml
-	 * - testProperties.xml
+	 * - abc.def.testProperties.xml
 	 * 
 	 * Will find "test" in testProperties.xml
 	 */
 	@Test
-	public void testOneDecoratorsFoundInBaseFile() {
-		
-		Collection<Decorator> decorators = new ArrayList<Decorator>();
-		SingleTag tag01 = new SingleTag("abc");
-		SingleTagDecorator decorator01 = new SingleTagDecorator();
-		decorator01.setMethod(Method.PREFIX);
-		decorator01.setTag(tag01);
-		decorators.add(decorator01);
-		wrapper.setDecorators(decorators);
-		
-		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
-		String value = wrapper.locate(UriUtils.toUri("test"), parameters).getValue().toString();
-		
-		System.out.println(wrapper.getLocations());
-		Assert.assertEquals("success", value);
-		Assert.assertEquals(2, wrapper.getLocations().size());
-		
-		FileLocation location01 = (FileLocation) wrapper.getLocations().get(0);
-		Assert.assertEquals("abc.testProperties.xml", location01.getFile());
-		
-		FileLocation location02 = (FileLocation) wrapper.getLocations().get(1);
-		Assert.assertEquals("testProperties.xml", location02.getFile());
-	}
-	
-	/*
-	 * Will check:
-	 * - def.abc.testProperties.xml
-	 * - abc.testProperties.xml
-	 * - testProperties.xml
-	 * 
-	 * Will find "test" in testProperties.xml
-	 */
-	@Test
-	public void testTwoDecoratorsFoundInFirstLocation() {
+	public void testTwoPrefixLocationDecorators() {
 		
 		Collection<Decorator> decorators = new ArrayList<Decorator>();
 		
@@ -140,28 +103,20 @@ public class FileLocationDecoratingWrapperTest {
 		
 		System.out.println(wrapper.getLocations());
 		Assert.assertEquals("kazam", value);
-		Assert.assertEquals(2, wrapper.getLocations().size());
+		Assert.assertEquals(1, wrapper.getLocations().size());
 		
 		FileLocation location01 = (FileLocation) wrapper.getLocations().get(0);
-		Assert.assertEquals("def.abc.testProperties.xml", location01.getFile());
-		
-		FileLocation location02 = (FileLocation) wrapper.getLocations().get(1);
-		Assert.assertEquals("abc.testProperties.xml", location02.getFile());
-		
-		FileLocation location03 = (FileLocation) wrapper.getLocations().get(2);
-		Assert.assertEquals("testProperties.xml", location03.getFile());
+		Assert.assertEquals("abc.def.testProperties.xml", location01.getFile());
 	}
 	
 	/*
 	 * Will check:
-	 * - def.abc.testProperties.xml
-	 * - abc.testProperties.xml
-	 * - testProperties.xml
+	 * - abc.def.ghi.testProperties.xml
 	 * 
 	 * Will find "test" in testProperties.xml
 	 */
 	@Test
-	public void testThreeDecoratorsFoundInBaseLocation() {
+	public void testThreePrefixLocationDecorators() {
 		
 		Collection<Decorator> decorators = new ArrayList<Decorator>();
 		
@@ -189,19 +144,10 @@ public class FileLocationDecoratingWrapperTest {
 		String value = wrapper.locate(UriUtils.toUri("test"), parameters).getValue().toString();
 		
 		System.out.println(wrapper.getLocations());
-		Assert.assertEquals("success", value);
-		Assert.assertEquals(2, wrapper.getLocations().size());
+		Assert.assertEquals("butters", value);
+		Assert.assertEquals(1, wrapper.getLocations().size());
 		
 		FileLocation location01 = (FileLocation) wrapper.getLocations().get(0);
-		Assert.assertEquals("ghi.def.abc.testProperties.xml", location01.getFile());
-		
-		FileLocation location02 = (FileLocation) wrapper.getLocations().get(1);
-		Assert.assertEquals("def.abc.testProperties.xml", location02.getFile());
-		
-		FileLocation location03 = (FileLocation) wrapper.getLocations().get(2);
-		Assert.assertEquals("abc.testProperties.xml", location03.getFile());
-		
-		FileLocation location04 = (FileLocation) wrapper.getLocations().get(3);
-		Assert.assertEquals("testProperties.xml", location04.getFile());
+		Assert.assertEquals("abc.def.ghi.testProperties.xml", location01.getFile());
 	}
 }

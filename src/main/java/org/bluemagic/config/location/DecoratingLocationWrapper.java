@@ -3,8 +3,6 @@ package org.bluemagic.config.location;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.bluemagic.config.api.Decorator;
@@ -26,20 +24,12 @@ public abstract class DecoratingLocationWrapper implements Location {
 	protected Collection<URI> decorateUri(URI key, Map<MagicKey, Object> parameters) {
 		
 		Collection<URI> decoratedList = new ArrayList<URI>();
-		
-		// COPY THE DECORATOR LIST AND REVERSE IT
-		List<Decorator> reversedDecorators = new ArrayList<Decorator>(this.decorators);
-		Collections.reverse(reversedDecorators);
-		
-		// ADD THE UNDECORATED VALUE
 		decoratedList.add(key);
 		
 		// ITERATE THRU EACH DECORATOR AND DECORATE THE URI
-		for (Decorator decorator : reversedDecorators) {
-			
-			decoratedList.addAll(decorator.decorate(decoratedList, parameters));
+		for (Decorator decorator : decorators) {
+			decoratedList = decorator.decorate(decoratedList, parameters);
 		}
-		
 		return decoratedList;
 	}
 	

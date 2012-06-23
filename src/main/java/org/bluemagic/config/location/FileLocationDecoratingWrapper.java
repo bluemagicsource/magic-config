@@ -89,8 +89,6 @@ public class FileLocationDecoratingWrapper extends DecoratingLocationWrapper {
 		
 		Entry<URI,Object> property = null;
 		
-		Collections.reverse(locations);
-		
 		// LOOP THROUGH THE LOCATIONS
 		for (Location location : locations) {
 			
