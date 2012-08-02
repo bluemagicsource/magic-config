@@ -16,28 +16,20 @@ public class Hashtag extends SingleTag {
 	public static final String HASHTAG_PREFIX = "#";
 
 	public Hashtag() { 
-		this.prefix = HASHTAG_PREFIX;
+		
 	}
 	
 	public Hashtag(String value) {
-		this.prefix = HASHTAG_PREFIX;
-		this.value = value;
-	}
-	
-	public Hashtag(String prefix, String value, String suffix) {
-
-		setPrefix(prefix);
-		this.value = value;
-		setSuffix(suffix);
+		this.setValue(value);
 	}
 	
 	@Override
-	public void setPrefix(String prefix) {
+	public void setValue(String value) {
 		
-		if ((prefix != null) && (prefix.startsWith(HASHTAG_PREFIX))) {			
-			this.prefix = prefix;
+		if ((value != null) && (value.startsWith(HASHTAG_PREFIX))) {			
+			this.value = value;
 		} else {
-			this.prefix = HASHTAG_PREFIX + prefix;
+			this.value = HASHTAG_PREFIX + value;
 		}
 	}
 	

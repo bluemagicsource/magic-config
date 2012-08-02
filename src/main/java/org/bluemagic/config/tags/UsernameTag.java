@@ -2,8 +2,6 @@ package org.bluemagic.config.tags;
 
 import org.bluemagic.config.api.tag.SingleTag;
 
-import org.bluemagic.config.api.tag.SingleTag;
-
 /**
  * Implements the common username tags found on Twitter
  * For example @SteveJobs or @billybob 
@@ -16,33 +14,20 @@ public class UsernameTag extends SingleTag {
     public static final String USERNAME_PREFIX = "@";
 
 	public UsernameTag() { 
-		this.prefix = USERNAME_PREFIX;
+		
 	}
 	
 	public UsernameTag(String value) {
-		this.prefix = USERNAME_PREFIX;
-		this.value = value.toLowerCase();
-	}
-	
-	public UsernameTag(String prefix, String value, String suffix) {
-
-		setPrefix(prefix);
-		this.value = value.toLowerCase();
-		setSuffix(suffix);
-	}
-	
-	@Override
-	public void setPrefix(String prefix) {
-		
-		if ((prefix != null) && (prefix.startsWith(USERNAME_PREFIX))) {			
-			this.prefix = prefix;
-		} else {
-			this.prefix = USERNAME_PREFIX + prefix;
-		}
+		this.setValue(value);
 	}
 	
 	@Override
 	public void setValue(String value) {
-		super.setValue(value.toLowerCase());
+		
+		if ((value != null) && (value.startsWith(USERNAME_PREFIX))) {			
+			this.value = value;
+		} else {
+			this.value = USERNAME_PREFIX + value;
+		}
 	}
 }
