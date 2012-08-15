@@ -1,4 +1,4 @@
-package org.bluemagic.config.tags;
+package org.bluemagic.config.tag;
 
 import org.bluemagic.config.api.tag.SingleTag;
 

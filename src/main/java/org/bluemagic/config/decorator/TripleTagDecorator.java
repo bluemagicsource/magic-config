@@ -7,6 +7,7 @@ import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.UnsupportedTagException;
+import org.bluemagic.config.tag.TagEncoder;
 import org.bluemagic.config.util.UriUtils;
 
 public class TripleTagDecorator extends TagDecorator {
@@ -16,7 +17,7 @@ public class TripleTagDecorator extends TagDecorator {
 		TripleTag tripleTag = (TripleTag) getTag();
 		
 		// ADD PARAMETER TO THE URI
-		return UriUtils.addParameterToUri(key, tripleTag.encodeString(tripleTag.getNamespace() + tripleTag.getNameSpacePredicateSeparator() + tripleTag.getPredicate(), getEncoding()), tripleTag.encodeString(tripleTag.getValue(), getEncoding()));
+		return UriUtils.addParameterToUri(key, TagEncoder.encodeString(tripleTag.getNamespace() + tripleTag.getNameSpacePredicateSeparator() + tripleTag.getPredicate(), getEncoding()), TagEncoder.encodeString(tripleTag.getValue(), getEncoding()));
 	}
 	
 	public boolean supports(Tag tag) {

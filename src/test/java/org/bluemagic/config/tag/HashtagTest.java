@@ -1,8 +1,8 @@
-package org.bluemagic.config.tags;
+package org.bluemagic.config.tag;
 
 import static org.junit.Assert.assertEquals;
 
-import org.bluemagic.config.tags.Hashtag;
+import org.bluemagic.config.tag.Hashtag;
 import org.junit.Test;
 
 public class HashtagTest {

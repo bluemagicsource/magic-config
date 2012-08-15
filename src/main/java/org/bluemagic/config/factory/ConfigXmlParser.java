@@ -22,7 +22,6 @@ import org.bluemagic.config.api.property.LocatedProperty;
 import org.bluemagic.config.api.tag.DoubleTag;
 import org.bluemagic.config.api.tag.SingleTag;
 import org.bluemagic.config.api.tag.Tag;
-import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.exception.MagicConfigParserException;
 import org.bluemagic.config.location.FileLocation;
@@ -213,7 +212,7 @@ public class ConfigXmlParser {
 		return locations;	
 	}
 
-	private Collection<Decorator> parseDecorator(Node n, Encoding encoding) {
+	private Collection<Decorator> parseDecorator(Node n, String encoding) {
 		
 		LOG.trace("Encountered XML: " + n.getNodeName());
 		Collection<Decorator> decorators = new ArrayList<Decorator>();
@@ -236,7 +235,7 @@ public class ConfigXmlParser {
 		return decorators;
 	}
 
-	private Decorator parseTag(final Node n, String method, Encoding encoding) {
+	private Decorator parseTag(final Node n, String method, String encoding) {
 
 		LOG.trace("Encountered XML: " + n.getNodeName());
 		String className = n.getNodeName();

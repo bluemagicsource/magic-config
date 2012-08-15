@@ -1,4 +1,4 @@
-package org.bluemagic.config.tags;
+package org.bluemagic.config.tag;
 
 import java.net.InetAddress;
 

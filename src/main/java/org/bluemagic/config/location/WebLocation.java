@@ -6,10 +6,9 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
 
-import org.bluemagic.config.api.tag.Tag;
-import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.repository.file.PropertiesFileRepository;
 import org.bluemagic.config.repository.web.RemoteFileRepository;
+import org.bluemagic.config.tag.TagEncoder;
 import org.bluemagic.config.util.UriUtils;
 
 public class WebLocation extends RepositoryBackedLocation {
@@ -77,8 +76,8 @@ public class WebLocation extends RepositoryBackedLocation {
 	}
 	
 	@Override
-	public Encoding getEncoding() {
-		return Tag.Encoding.NONE;
+	public String getEncoding() {
+		return TagEncoder.URL_ENCODING;
 	}
 
 	public String getPrefix() {

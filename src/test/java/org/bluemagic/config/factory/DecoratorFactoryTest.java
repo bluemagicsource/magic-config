@@ -6,7 +6,6 @@ import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.tag.DoubleTag;
 import org.bluemagic.config.api.tag.SingleTag;
 import org.bluemagic.config.api.tag.TripleTag;
-import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.decorator.DoubleTagDecorator;
 import org.bluemagic.config.decorator.SingleTagDecorator;
 import org.bluemagic.config.decorator.TripleTagDecorator;
@@ -20,7 +19,7 @@ public class DecoratorFactoryTest {
 		SingleTag tag = new SingleTag("abc");
 		DecoratorFactory df = new DecoratorFactory();
 		
-		Decorator decorator = df.build(tag, "prefix", Encoding.NONE);
+		Decorator decorator = df.build(tag, "prefix", "");
 		
 		Assert.assertTrue(decorator instanceof SingleTagDecorator);
 		Assert.assertEquals(tag, ((SingleTagDecorator) decorator).getTag());
@@ -33,7 +32,7 @@ public class DecoratorFactoryTest {
 		DoubleTag tag = new DoubleTag("key", "abc");
 		DecoratorFactory df = new DecoratorFactory();
 		
-		Decorator decorator = df.build(tag, "placeholder", Encoding.NONE);
+		Decorator decorator = df.build(tag, "placeholder", "");
 		
 		Assert.assertTrue(decorator instanceof DoubleTagDecorator);
 		Assert.assertEquals(tag, ((DoubleTagDecorator) decorator).getTag());
@@ -46,7 +45,7 @@ public class DecoratorFactoryTest {
 		TripleTag tag = new TripleTag("name", "pred", "abc");
 		DecoratorFactory df = new DecoratorFactory();
 		
-		Decorator decorator = df.build(tag, "suffix", Encoding.NONE);
+		Decorator decorator = df.build(tag, "suffix", "");
 		
 		Assert.assertTrue(decorator instanceof TripleTagDecorator);
 		Assert.assertEquals(tag, ((TripleTagDecorator) decorator).getTag());

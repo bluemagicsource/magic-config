@@ -7,6 +7,7 @@ import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.tag.DoubleTag;
 import org.bluemagic.config.api.tag.Tag;
 import org.bluemagic.config.exception.UnsupportedTagException;
+import org.bluemagic.config.tag.TagEncoder;
 import org.bluemagic.config.util.UriUtils;
 
 public class DoubleTagDecorator extends TagDecorator {
@@ -16,7 +17,7 @@ public class DoubleTagDecorator extends TagDecorator {
 		DoubleTag doubleTag = (DoubleTag) getTag();
 		
 		// ADD PARAMETER TO THE URI
-		return UriUtils.addParameterToUri(key, doubleTag.encodeString(doubleTag.getKey(), getEncoding()), doubleTag.encodeString(doubleTag.getValue(), getEncoding()));
+		return UriUtils.addParameterToUri(key, TagEncoder.encodeString(doubleTag.getKey(), getEncoding()), TagEncoder.encodeString(doubleTag.getValue(), getEncoding()));
 	}
 	
 	public boolean supports(Tag tag) {

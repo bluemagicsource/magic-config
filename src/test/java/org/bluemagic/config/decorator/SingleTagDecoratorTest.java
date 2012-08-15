@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.tag.SingleTag;
-import org.bluemagic.config.api.tag.Tag.Encoding;
+import org.bluemagic.config.tag.TagEncoder;
 import org.bluemagic.config.util.UriUtils;
 import org.junit.Test;
 
@@ -21,8 +21,8 @@ public class SingleTagDecoratorTest {
 		singleTag.setValue("my Tag");
 		
 		SingleTagDecorator std = new SingleTagDecorator();
-		std.setEncoding(Encoding.WEB);
 		std.setTag(singleTag);
+		std.setEncoding(TagEncoder.URL_ENCODING);
 		
 		URI key = UriUtils.toUri("abc");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
@@ -38,7 +38,7 @@ public class SingleTagDecoratorTest {
 		
 		SingleTagDecorator std = new SingleTagDecorator();
 		std.setTag(singleTag);
-		std.setEncoding(Encoding.WEB);
+		std.setEncoding(TagEncoder.URL_ENCODING);
 		
 		URI key = UriUtils.toUri("abc");
 		Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();

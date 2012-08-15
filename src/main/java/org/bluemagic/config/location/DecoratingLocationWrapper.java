@@ -8,7 +8,6 @@ import java.util.Map;
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
 import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.api.tag.Tag.Encoding;
 
 public abstract class DecoratingLocationWrapper implements Location {
 	
@@ -52,10 +51,10 @@ public abstract class DecoratingLocationWrapper implements Location {
 	}
 	
 	@Override
-	public Encoding getEncoding() {
+	public String getEncoding() {
 		
 		if (internal == null) {
-			return Encoding.NONE;
+			return "";
 		}
 		return internal.getEncoding();
 	}

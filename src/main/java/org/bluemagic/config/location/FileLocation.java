@@ -5,11 +5,10 @@ import java.net.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.tag.Tag;
-import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.repository.DirectoryRepository;
 import org.bluemagic.config.repository.file.PropertiesFileRepository;
 import org.bluemagic.config.repository.file.TextFileRepository;
+import org.bluemagic.config.tag.TagEncoder;
 
 public class FileLocation extends RepositoryBackedLocation {
 	
@@ -89,8 +88,8 @@ public class FileLocation extends RepositoryBackedLocation {
 	}
 	
 	@Override
-	public Encoding getEncoding() {
-		return Tag.Encoding.FILE;
+	public String getEncoding() {
+		return TagEncoder.FILE_ENCODING;
 	}
 
 	public String getFolder() {

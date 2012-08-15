@@ -11,7 +11,7 @@ public class TagFactory {
 	private static final Log LOG = LogFactory.getLog(TagFactory.class);
 
 	public static String API_TAG_PREFIX = "org.bluemagic.config.api.tag.";
-	public static String CONFIG_TAG_PREFIX = "org.bluemagic.config.tags.";
+	public static String CONFIG_TAG_PREFIX = "org.bluemagic.config.tag.";
 	
 	public Tag build(String className) {
 		String originalClassName = className;

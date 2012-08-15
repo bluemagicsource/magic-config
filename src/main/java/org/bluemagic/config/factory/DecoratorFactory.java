@@ -7,7 +7,6 @@ import org.bluemagic.config.api.Decorator.Method;
 import org.bluemagic.config.api.tag.DoubleTag;
 import org.bluemagic.config.api.tag.SingleTag;
 import org.bluemagic.config.api.tag.Tag;
-import org.bluemagic.config.api.tag.Tag.Encoding;
 import org.bluemagic.config.api.tag.TripleTag;
 import org.bluemagic.config.decorator.DoubleTagDecorator;
 import org.bluemagic.config.decorator.SingleTagDecorator;
@@ -17,7 +16,7 @@ public class DecoratorFactory {
 	
 	private static final Log LOG = LogFactory.getLog(DecoratorFactory.class);
 
-	public Decorator build(Tag tag, String method, Encoding encoding) {
+	public Decorator build(Tag tag, String method, String encoding) {
 		
 		Decorator decorator = null;
 		
