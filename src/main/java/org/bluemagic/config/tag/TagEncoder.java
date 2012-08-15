@@ -29,33 +29,6 @@ public class TagEncoder {
 		}
 		return encoded;
 	}
-
-	private static String encodeSingle(SingleTag tag, String enc) {
-		return encodeString(tag.getValue(), enc);
-	}
-
-	private static String encodeDouble(DoubleTag tag, String enc) {
-		
-		StringBuilder b = new StringBuilder();
-		
-		b.append(encodeString(tag.getKey(), enc));
-		b.append(tag.getKeyValueSeparator());
-		b.append(encodeString(tag.getValue(), enc));
-		
-		return b.toString();
-	}
-
-	private static String encodeTriple(TripleTag tag, String enc) {
-			
-		StringBuilder b = new StringBuilder();
-		b.append(encodeString(tag.getNamespace(), enc));
-		b.append(tag.getNameSpacePredicateSeparator());
-		b.append(encodeString(tag.getPredicate(), enc));
-		b.append(tag.getPredicateValueSeparator());
-		b.append(encodeString(tag.getValue(), enc));
-
-		return b.toString();
-	}
 	
 	public static String encodeString(String unencoded, String enc) {
 
@@ -88,5 +61,32 @@ public class TagEncoder {
 			encoded = unencoded;
 		}
 		return encoded;
+	}
+
+	private static String encodeSingle(SingleTag tag, String enc) {
+		return encodeString(tag.getValue(), enc);
+	}
+
+	private static String encodeDouble(DoubleTag tag, String enc) {
+		
+		StringBuilder b = new StringBuilder();
+		
+		b.append(encodeString(tag.getKey(), enc));
+		b.append(tag.getKeyValueSeparator());
+		b.append(encodeString(tag.getValue(), enc));
+		
+		return b.toString();
+	}
+
+	private static String encodeTriple(TripleTag tag, String enc) {
+			
+		StringBuilder b = new StringBuilder();
+		b.append(encodeString(tag.getNamespace(), enc));
+		b.append(tag.getNameSpacePredicateSeparator());
+		b.append(encodeString(tag.getPredicate(), enc));
+		b.append(tag.getPredicateValueSeparator());
+		b.append(encodeString(tag.getValue(), enc));
+
+		return b.toString();
 	}
 }
