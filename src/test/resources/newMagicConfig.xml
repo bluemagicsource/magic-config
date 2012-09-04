@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<magic>
+
+<!-- 
+    <commandLineLocation />
+ -->
+    <fileLocation folder="/home/me/properties/" />
+	<fileLocation file="testProperties.xml">
+		<locationDecorator prefixSeparator="_">
+			<singleTag method="prefix">file</singleTag>
+		</locationDecorator>
+	</fileLocation>
+    <fileLocation file="testProperties.xml">
+        <attempt>
+            <locationDecorator prefixSeparator="_">
+                <singleTag method="prefix">123</singleTag>
+            </locationDecorator>
+            <keyDecorator>
+                <singleTag method="suffix">abc</singleTag>
+                <singleTag method="suffix">def</singleTag>
+            </keyDecorator>
+        </attempt>
+        <attempt>
+        	<keyDecorator>
+        		<singleTag method="prefix">abc</singleTag>
+        		<singleTag method="suffix">def</singleTag>
+        	</keyDecorator>
+        </attempt>
+    </fileLocation>
+    <webLocation uri="https://www.bluemagic.org/magic/property/">
+        <attempt>
+            <keyDecorator>
+                <doubleTag key="version">1</doubleTag>
+                <hostnameTag method="prefix" />
+            </keyDecorator>
+        </attempt>
+        <attempt>
+            <keyDecorator>
+                <doubleTag method="prefix" key="version">1</doubleTag>
+                <tripleTag method="prefix" namespace="1" predicate="2">3</tripleTag>
+            </keyDecorator>
+         </attempt>
+    </webLocation>
+
+
+</magic>

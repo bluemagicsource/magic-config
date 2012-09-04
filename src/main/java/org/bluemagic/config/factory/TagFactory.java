@@ -1,53 +1,13 @@
 package org.bluemagic.config.factory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bluemagic.config.api.tag.Tag;
-import org.bluemagic.config.util.ReflectionUtils;
-import org.bluemagic.config.util.StringUtils;
+import java.util.Map;
 
-public class TagFactory {
-	
-	private static final Log LOG = LogFactory.getLog(TagFactory.class);
+import org.bluemagic.config.tag.MethodDecoratedTag;
 
-	public static String API_TAG_PREFIX = "org.bluemagic.config.api.tag.";
-	public static String CONFIG_TAG_PREFIX = "org.bluemagic.config.tag.";
-	
-	public Tag build(String className) {
-		String originalClassName = className;
-		
-		Tag tag = null;
-		Class<?> clazz = null;
-		Object instance = null;
-		
-		// 	TRY GETTING CLASS WITHOUT ADDING API PACKAGE
-		clazz = ReflectionUtils.classFromName(originalClassName);
-		
-		if (clazz == null) {
-			className = TagFactory.API_TAG_PREFIX + StringUtils.capitalize(originalClassName);
-			
-			// 	TRY GETTING CLASS AFTER ADDING API PACKAGE
-			clazz = ReflectionUtils.classFromName(className);
-		}
-		
-		if (clazz == null) {
-            className = TagFactory.CONFIG_TAG_PREFIX + StringUtils.capitalize(originalClassName);
-			
-			// 	TRY GETTING CLASS AFTER ADDING CONFIG PACKAGE
-			clazz = ReflectionUtils.classFromName(className);
-		}
-		
-		// TRY CREATING AND INSTANCE
-		if (clazz != null) {
-			instance = ReflectionUtils.instantiateClass(clazz);
-		}
-		if ((instance != null) && (instance instanceof Tag)) {
-			
-			// CAST AS A TAG AND RETURN
-			tag = (Tag) instance;
-			LOG.debug("Created: " + tag.toString() + " as instanceof: " + clazz.getName());
-		}
-		
-		return tag;
-	}
+/**
+ * A basic interface for factory that creates Tag objects
+ */
+public interface TagFactory {
+
+	public MethodDecoratedTag createTag(String tagType, Map<String, String> attributes, String tagValue);
 }

@@ -1,312 +1,183 @@
 package org.bluemagic.config.factory;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.Decorator;
 import org.bluemagic.config.api.Location;
-import org.bluemagic.config.api.MagicKey;
-import org.bluemagic.config.api.property.LocatedProperty;
-import org.bluemagic.config.api.tag.DoubleTag;
-import org.bluemagic.config.api.tag.SingleTag;
 import org.bluemagic.config.api.tag.Tag;
-import org.bluemagic.config.api.tag.TripleTag;
-import org.bluemagic.config.exception.MagicConfigParserException;
-import org.bluemagic.config.location.FileLocation;
-import org.bluemagic.config.location.KeyDecoratingLocationWrapper;
-import org.bluemagic.config.repository.file.TextFileRepository;
-import org.bluemagic.config.util.StringUtils;
-import org.bluemagic.config.util.UriUtils;
+import org.bluemagic.config.tag.MethodDecoratedTag;
+import org.bluemagic.config.util.DocumentUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 
 public class ConfigXmlParser {
 	
 	private static final Log LOG = LogFactory.getLog(ConfigXmlParser.class);
 	
-	private LocationFactory locationFactory;
+	private static LocationFactory locationFactory = LocationFactoryImpl.getInstance();
 	
-	private DecoratorFactory decoratorFactory;
+	private static DecoratorFactory decoratorFactory = DecoratorFactoryImpl.getInstance();
 	
-	private TagFactory tagFactory;
+	private static TagFactory tagFactory = TagFactoryImpl.getInstance();
 	
-	private TransformerFactory transformerFactory;
-
+	private ConfigXmlParser() {}
 	
-	public Collection<Location> buildLocations(Collection<Location> agentLocations) {
+	public static List<Location> parseMagicConfig(String pathToConfig) {
 		
-		for (Location location : agentLocations) {
-			
-			if (location instanceof FileLocation) {
-				
-				FileLocation local = (FileLocation) location;
-				URI key = UriUtils.toUri(local.getFile());
-				local.setRepository(new TextFileRepository());
-				Map<MagicKey, Object> parameters = new HashMap<MagicKey, Object>();
-				
-				parameters.put(MagicKey.ORIGINAL_URI, key);
-				Entry<URI,Object> property = local.locate(key, parameters);
-				
-				if ((property instanceof LocatedProperty) && (!property.getValue().toString().isEmpty())) {
-					return parse(property.getValue().toString());
-				}
+		LOG.info("Parsing magic config file: " + pathToConfig);
+		
+		// Perform XSD validation on the config file
+		
+		// Parse the config file to a document
+		Document document = DocumentUtils.createDocument(pathToConfig);
+		
+		// Get the location elements from the xml
+		List<Location> locations = new ArrayList<Location>();
+		Element rootElement = document.getDocumentElement();
+		List<Element> locationElements = DocumentUtils.getElementList(rootElement.getChildNodes());
+		
+		// Loop through the locationElements and create Location objects
+		for (Element locationElement : locationElements) {
+			List<Location> newLocations = createLocation(locationElement);
+			if (newLocations != null) {
+				locations.addAll(newLocations);
 			}
 		}
-		return null;
-	}
-	
-	public Collection<Location> parse(String xmlAsString) {
 		
-		Document dom;
+		LOG.info("There were " + locations.size() + " locations created from the config file");
+		for (Location location : locations) {
+			LOG.debug(location);
+		}
+		
+		return locations;
+	}
+
+	private static List<Location> createLocation(Element locationElement) {
+		
+		LOG.debug("Going to create location from element: " + locationElement.getNodeName());
+		
 		List<Location> locations = new ArrayList<Location>();
 		
-		//get the factory
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	
-		try {
-	
-			//Using factory get an instance of document builder
-			DocumentBuilder db = dbf.newDocumentBuilder();
-	
-			//parse using builder to get DOM representation of the XML file
-			dom = db.parse(new ByteArrayInputStream(xmlAsString.getBytes("UTF-8")));
-	
-			Element docEle = dom.getDocumentElement();
-
-			NodeList nl = docEle.getChildNodes();
-			if(nl != null && nl.getLength() > 0) {
+		if (locationElement.getChildNodes().getLength() == 0) {
+			
+			// THIS IS A SIMPLE LOCATION, NO DECORATORS OR TAGS
+			
+			LOG.debug("Creating location without decorators");
+			
+			// Create the simple un-decorated location
+			locations.add(locationFactory.createLocation(locationElement.getNodeName(), 
+					                                     DocumentUtils.getAttributesMap(locationElement)));
+			
+			LOG.debug("Location created: " + locations);
+			
+		} else {
+			
+			LOG.debug("Going to create decorators for location");
+			
+			// THIS IS A COMPLEX LOCATION, IT COULD EITHER CONTAIN DECORATORS DIRECTLY OR ATTEMPT BLOCKS
+			List<Element> locationChildren = DocumentUtils.getElementList(locationElement.getChildNodes());
+			for (Element element : locationChildren) {
 				
-				for(int i = 0 ; i < nl.getLength();i++) {
+				if (element.getNodeName().equals("attempt")) {
 					
-					Node node = nl.item(i);
-					String nodeName = node.getNodeName();
+					LOG.info("Attempt found, create location from it's children");
+					locations.add(createDecoratedLocation(locationElement.getNodeName(), 
+													      DocumentUtils.getAttributesMap(locationElement),
+													      element));
+				} else {
 					
-					if (!nodeName.startsWith("#")) {
-						
-						if ("data-transformers".equals(nodeName)) {
-							//target.setparseDataTranformers();
-						}
-						if ("list".equals(nodeName)) {
-							
-							locations.addAll(parseList(node));
-							//target.setConfigs(configList);
-						}
-					}
+					LOG.info("No attempt found, create location from this element");
+					locations.add(createDecoratedLocation(locationElement.getNodeName(), 
+													      DocumentUtils.getAttributesMap(locationElement),
+													      locationElement));
 				}
 			}
-			LOG.trace("Parsing COMPLETE!");
-	
-		} catch(Throwable t) {
-			String message = "Parse FAILURE!";
-			LOG.fatal(message, t);
-			throw new MagicConfigParserException(message, t);
 		}
+		
 		return locations;
 	}
-
-	private Collection<Location> parseList(Node n) {
-
-		Collection<Location> locations = new ArrayList<Location>();
-		LOG.trace("Encountered XML: " + n.getNodeName());
+	
+	private static Location createDecoratedLocation(String locationType, Map<String, String> attributes, Element locationElement) {
 		
-		NodeList nl = n.getChildNodes();
-		if(nl != null && nl.getLength() > 0) {
+		List<Decorator> locationDecorators = new ArrayList<Decorator>();
+		List<Decorator> keyDecorators = new ArrayList<Decorator>();
+		createDecorators(locationElement, locationDecorators, keyDecorators);
+		
+		LOG.debug("Location decorators created: " + locationDecorators);
+		LOG.debug("Key decorators created: " + keyDecorators);
+		LOG.debug("Creating decorated location");
+		
+		// Create the decorated location
+		Location location = locationFactory.createLocation(locationType, 
+				                                           attributes, 
+												           locationDecorators,
+												           keyDecorators);
+		
+		LOG.debug("Decorated location created: " + location);
+		
+		return location;
+	}
+
+	private static void createDecorators(Node locationNode, List<Decorator> locationDecorators, List<Decorator> keyDecorators) {
+		
+		// Get the decorator elements from the location element
+		List<Element> decoratorElements = DocumentUtils.getElementList(locationNode.getChildNodes());
+		
+		// a decorator MUST have at least one tag
+		for (Element decoratorElement : decoratorElements) {
 			
-			for(int i = 0 ; i < nl.getLength();i++) {
-				
-				Node node = nl.item(i);
-				String nodeName = node.getNodeName();
-				
-				if (!nodeName.startsWith("#")) {
-					LOG.trace("Encountered XML: " + nodeName);
-					locations.addAll(parseLocation(node));
-				}
-			}
-		}
-		return locations;
-	}
-
-	private Collection<Location> parseLocation(Node n) {
-		
-		Location rootLocation = null;
-		Collection<Decorator> decorators = new ArrayList<Decorator>();
-		Collection<Location> locations = new ArrayList<Location>();
-		
-		// REGULAR LOCATION
-		String nodeName = n.getNodeName();
-		
-		if ("location".equals(nodeName)) {
-			nodeName = "decoratingLocationWrapper";
-		}
-		String locationClassName = nodeName;
-		rootLocation = locationFactory.build(locationClassName);
-		
-		NamedNodeMap attributes = n.getAttributes();
-		for (int i = 0; i < attributes.getLength(); i++) {
-			String key = attributes.item(i).getNodeName();
-			String value = attributes.item(i).getNodeValue();
-			callSetterMethod(rootLocation, key, value);
-		}
-		
-		if (rootLocation == null) {
-			// BIG PROBLEM IF WE CANT GET A TAG
-			throw new MagicConfigParserException("Could not find LOCATION class: " + locationClassName + " on classpath!");
-		}
-		
-		NodeList nl = n.getChildNodes();
-		if(nl != null && nl.getLength() > 0) {
+			LOG.debug("Going to create tags for decorator: " + decoratorElement);
 			
-			for(int i = 0 ; i < nl.getLength();i++) {
-				
-				Node node = nl.item(i);
-				nodeName = node.getNodeName();
-				
-				if (!nodeName.startsWith("#")) {
-					
-					if ("list".equals(nodeName)) {
-						Collection<Location> subLocations = parseList(node);
-						
-						for (Location l : subLocations) {
-							
-							if (l instanceof KeyDecoratingLocationWrapper) {
-
-								KeyDecoratingLocationWrapper dlw = (KeyDecoratingLocationWrapper) l;
-								dlw.setDecorators(decorators);
-								dlw.setInternal(rootLocation);
-								
-								locations.add(dlw);
-							}
-						}
-					}
-					
-					if ("decorator".equals(nodeName)) {
-						decorators.addAll(parseDecorator(node, rootLocation.getEncoding()));
-					}
-
-					if (rootLocation instanceof KeyDecoratingLocationWrapper) {
-
-						KeyDecoratingLocationWrapper dlw = (KeyDecoratingLocationWrapper) rootLocation;
-						dlw.setDecorators(decorators);
-					}
-				}
-			}
-		}
-		locations.add(rootLocation);
-		
-		return locations;	
-	}
-
-	private Collection<Decorator> parseDecorator(Node n, String encoding) {
-		
-		LOG.trace("Encountered XML: " + n.getNodeName());
-		Collection<Decorator> decorators = new ArrayList<Decorator>();
-		String method = n.getAttributes().getNamedItem("method").getNodeValue();
-		
-		NodeList nl = n.getChildNodes();
-		if(nl != null && nl.getLength() > 0) {
+			List<MethodDecoratedTag> tags = createTags(decoratorElement);
 			
-			for(int i = 0 ; i < nl.getLength();i++) {
+			LOG.debug("Tags created: " + tags);
+			
+			// Tags are required for a Decorator
+			if (tags.size() == 0) {
+				throw new RuntimeException("No tags created for decorator: " + decoratorElement);
+			}
+			
+			for (MethodDecoratedTag tag : tags) {
 				
-				Node node = nl.item(i);
-				String nodeName = node.getNodeName();
+				LOG.debug("Creating decorator for tag: " + tag.getTag());
 				
-				if (!nodeName.startsWith("#")) {
-					Decorator decorator = parseTag(node, method, encoding);
-					decorators.add(decorator);
-				}
+	//			Decorator decorator = decoratorFactory.createDecorator(decoratorElement.getNodeName(), 
+	//					                                               DocumentUtils.getAttributesMap(decoratorElement), 
+	//					                                               tags);
+	//			
+	//			if (decoratorElement.getNodeName().equals("locationDecorator")) {
+	//				locationDecorators.add(decorator);
+	//			} else if (decoratorElement.getNodeName().equals("keyDecorator")) {
+	//				keyDecorators.add(decorator);
+	//			} else {
+	//				throw new RuntimeException("Unknown decorator type");
+	//			}
 			}
 		}
-		return decorators;
 	}
-
-	private Decorator parseTag(final Node n, String method, String encoding) {
-
-		LOG.trace("Encountered XML: " + n.getNodeName());
-		String className = n.getNodeName();
+	
+	private static List<MethodDecoratedTag> createTags(Element decoratorElement) {
 		
-		Tag tag = tagFactory.build(className);
+		List<MethodDecoratedTag> tags = new ArrayList<MethodDecoratedTag>();
 		
-		if (tag == null) {
-			// BIG PROBLEM IF WE CANT GET A TAG
-			throw new MagicConfigParserException("Could not find TAG class: " + className + " on classpath!");
+		// Get the tag elements from the decorator element
+		List<Element> tagElements = DocumentUtils.getElementList(decoratorElement.getChildNodes());
+		LOG.debug("Going to create " + tagElements.size() + " tags for this decorator");
+		
+		for (Element tagElement : tagElements) {
+			
+			LOG.debug("Creating tag from element: " + tagElement);
+
+			tags.add(tagFactory.createTag(tagElement.getNodeName(), 
+					 DocumentUtils.getAttributesMap(tagElement), 
+					 tagElement.getTextContent()));
 		}
 		
-		if ((tag instanceof SingleTag) || (tag instanceof DoubleTag) || (tag instanceof TripleTag)) {
-			String textContent = n.getTextContent();
-			if ((textContent != null) && (!textContent.isEmpty())) {
-				callSetterMethod(tag, "value", textContent);
-			}
-		}
-		NamedNodeMap attributes = n.getAttributes();
-		for (int i = 0; i < attributes.getLength(); i++) {
-			String key = attributes.item(i).getNodeName();
-			String value = attributes.item(i).getNodeValue();
-			callSetterMethod(tag, key, value);
-		}
-		Decorator decorator = decoratorFactory.build(tag, method, encoding);
-		
-		if (decorator == null) {
-			throw new MagicConfigParserException("Could not create a DECORATOR for TAG: " + tag.toString() + "!");
-		}
-		return decorator;
-	}
-
-	private void callSetterMethod(Object obj, String field, String value) {
-		
-		Method m = null;
-		try {
-			m = obj.getClass().getMethod("set" + StringUtils.capitalize(field), String.class);
-			m.invoke(obj, value);
-		} catch (Exception e) { 
-			e.printStackTrace();
-		}
-	}
-
-	public LocationFactory getLocationFactory() {
-		return locationFactory;
-	}
-
-	public void setLocationFactory(LocationFactory locationFactory) {
-		this.locationFactory = locationFactory;
-	}
-
-	public DecoratorFactory getDecoratorFactory() {
-		return decoratorFactory;
-	}
-
-	public void setDecoratorFactory(DecoratorFactory decoratorFactory) {
-		this.decoratorFactory = decoratorFactory;
-	}
-
-	public TagFactory getTagFactory() {
-		return tagFactory;
-	}
-
-	public void setTagFactory(TagFactory tagFactory) {
-		this.tagFactory = tagFactory;
-	}
-
-	public TransformerFactory getTransformerFactory() {
-		return transformerFactory;
-	}
-
-	public void setTransformerFactory(TransformerFactory transformerFactory) {
-		this.transformerFactory = transformerFactory;
+		return tags;
 	}
 }

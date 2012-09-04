@@ -17,9 +17,9 @@ public class DecoratorFactoryTest {
 	public void testBuildSingleTag() {
 		
 		SingleTag tag = new SingleTag("abc");
-		DecoratorFactory df = new DecoratorFactory();
+		DecoratorFactoryImpl df = (DecoratorFactoryImpl) DecoratorFactoryImpl.getInstance();
 		
-		Decorator decorator = df.build(tag, "prefix", "");
+		Decorator decorator = df.createDecorator("tagDecorator", null, tag, null);
 		
 		Assert.assertTrue(decorator instanceof SingleTagDecorator);
 		Assert.assertEquals(tag, ((SingleTagDecorator) decorator).getTag());
@@ -30,9 +30,9 @@ public class DecoratorFactoryTest {
 	public void testBuildDoubleTag() {
 		
 		DoubleTag tag = new DoubleTag("key", "abc");
-		DecoratorFactory df = new DecoratorFactory();
+		DecoratorFactoryImpl df = (DecoratorFactoryImpl) DecoratorFactoryImpl.getInstance();
 		
-		Decorator decorator = df.build(tag, "placeholder", "");
+		Decorator decorator = df.createDecorator("tagDecorator", null, tag, null);
 		
 		Assert.assertTrue(decorator instanceof DoubleTagDecorator);
 		Assert.assertEquals(tag, ((DoubleTagDecorator) decorator).getTag());
@@ -43,9 +43,9 @@ public class DecoratorFactoryTest {
 	public void testBuildTripleTag() {
 		
 		TripleTag tag = new TripleTag("name", "pred", "abc");
-		DecoratorFactory df = new DecoratorFactory();
+		DecoratorFactoryImpl df = (DecoratorFactoryImpl) DecoratorFactoryImpl.getInstance();
 		
-		Decorator decorator = df.build(tag, "suffix", "");
+		Decorator decorator = df.createDecorator("tagDecorator", null, tag, null);
 		
 		Assert.assertTrue(decorator instanceof TripleTagDecorator);
 		Assert.assertEquals(tag, ((TripleTagDecorator) decorator).getTag());
