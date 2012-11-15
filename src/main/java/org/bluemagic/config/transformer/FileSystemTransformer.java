@@ -16,6 +16,10 @@ import org.apache.commons.logging.LogFactory;
 import org.bluemagic.config.api.MagicKey;
 import org.bluemagic.config.api.Transformer;
 
+/***
+ * Transforms key value properties into file format
+ * @author Peter Platt
+ */
 public class FileSystemTransformer implements Transformer {
     
     private static final Log LOG = LogFactory.getLog(FileSystemTransformer.class);
@@ -25,6 +29,7 @@ public class FileSystemTransformer implements Transformer {
 
     
     /***
+     * Transforms key/value property into a file
      * @param key Property URI Value(key)
      * @param parameters Key Value pairs
      * @param data value in the key/value relationship
@@ -35,6 +40,7 @@ public class FileSystemTransformer implements Transformer {
     }    
     
     /*** 
+     * Stores key/value data to a file
      * @param key property key 
      * @param value property data 
      */
@@ -66,7 +72,7 @@ public class FileSystemTransformer implements Transformer {
             } catch (InvalidPropertiesFormatException invalidPropFormat) {
                 //This only happen if a file is empty or not formated properly program will continue   
                 LOG.debug("File '"+propertiesFileLoc+"' was not formated properly no longer loading xml data");
-            } catch (Throwable e) {                
+            } catch (Exception e) {                
                 // This only happens when we can't load properties file does user have permission or not properly formated
                 LOG.error("Unable to load properties file", e);
                 throw new RuntimeException(e);
@@ -84,10 +90,10 @@ public class FileSystemTransformer implements Transformer {
             //This should only happen if the user doesn't have permission to the directory to save 
             LOG.error("Unable to save xmlProperties",e);
             throw new RuntimeException(e);
-        } catch (Throwable t)
+        } catch (Exception e)
         {
-            LOG.error("General exception trace follows :",t);
-            throw new RuntimeException(t);
+            LOG.error("General exception trace follows :",e);
+            throw new RuntimeException(e);
         } finally {
             if (xmlProperties!= null) {
                 try {
