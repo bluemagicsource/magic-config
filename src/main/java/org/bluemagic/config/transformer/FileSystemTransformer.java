@@ -51,61 +51,74 @@ public class FileSystemTransformer implements Transformer {
         
         //sets the propertiesFileLoc variable to the either the URI or string file path
         //RTE happens if the URI isn't formated properly
-        if (propertiesFile != "") {
-            propertiesFileLoc = propertiesFile;
-        } else if (URIpropertiesFile != null) {            
-            if (URIpropertiesFile.getScheme().equals("file")) {                
-                propertiesFileLoc = URIpropertiesFile.getSchemeSpecificPart().substring(2).replace('/',File.separatorChar);
-            } else {
-                LOG.error("URI is not properly formated as a file");
-                throw new RuntimeException("URI is not properly formated as a file");
-            }
-        }
+        propertiesFileLoc = checkPropertiesFile();
         
-        File propertiesFileCheck = new File(propertiesFileLoc);
         //Tests if an existing properties file exists. If it does it opens it and associates it with 
         //the fileProperties variables. note: assumes the properties file is in XML format 
-        if (propertiesFileCheck.exists()) {
-            try {
-                FileInputStream xmlPropFileIn = new FileInputStream(propertiesFileLoc);
-                fileProperties.loadFromXML(xmlPropFileIn);            
-            } catch (InvalidPropertiesFormatException invalidPropFormat) {
-                //This only happen if a file is empty or not formated properly program will continue   
-                LOG.debug("File '"+propertiesFileLoc+"' was not formated properly no longer loading xml data");
-            } catch (Exception e) {                
-                // This only happens when we can't load properties file does user have permission or not properly formated
-                LOG.error("Unable to load properties file", e);
-                throw new RuntimeException(e);
-            }
-        }        
-
-        fileProperties.setProperty(key, value.toString());
+        fileProperties = loadExistingPropeties(fileProperties,propertiesFileLoc);
+         
+        //Sets additional properties
+        fileProperties.setProperty(key, value);
         
         //Saves to an XML formated properties file
         OutputStream xmlProperties = null;        
         try {
             xmlProperties = new FileOutputStream(propertiesFileLoc);
             fileProperties.storeToXML(xmlProperties, "");            
-        } catch (FileNotFoundException e)  {
-            //This should only happen if the user doesn't have permission to the directory to save 
-            LOG.error("Unable to save xmlProperties",e);
-            throw new RuntimeException(e);
-        } catch (Exception e)
-        {
-            LOG.error("General exception trace follows :",e);
+        } catch (Exception e){
+        	LOG.error("Unable to save xmlProperties",e);
             throw new RuntimeException(e);
         } finally {
-            if (xmlProperties!= null) {
-                try {
-                    xmlProperties.close();
-                } catch (IOException e) {
-                    LOG.error("Unable to close the xml Properties file",e);
-                }
-            }
+            try {
+            	xmlProperties.close();
+                } catch (IOException e) { LOG.error("Unable to close the xml Properties file",e);}            
         }
     }
     
-    /**
+    /***
+     * Loads any existing properties into the properties file
+     * @param fileProperties
+     * @param propertiesFileLoc
+     * @return
+     */
+    private Properties loadExistingPropeties(Properties fileProperties,String propertiesFileLoc) {
+    	File propertiesFileCheck = new File(propertiesFileLoc);
+        if (propertiesFileCheck.exists()) {
+            try {
+                FileInputStream xmlPropFileIn = new FileInputStream(propertiesFileLoc);
+                 fileProperties.loadFromXML(xmlPropFileIn);                 
+                 }catch (InvalidPropertiesFormatException invalidPropFormat) {
+                     //This only happen if a file is empty or not formated properly program will continue   
+                     LOG.debug("File '"+propertiesFileLoc+"' was not formated properly no longer loading xml data");} 
+            	catch (Exception e) {                
+                // This only happens when we can't load properties file does user have permission or not properly formated
+                LOG.error("Unable to load properties file", e);
+                throw new RuntimeException(e);
+            }
+        } 
+		return fileProperties;
+	}
+
+	/***
+     * Sets the properties file location
+     * @return full properties file location 
+     */
+    private String checkPropertiesFile() {	
+    	if (!propertiesFile.equals("")) { return propertiesFile;}	
+        if (URIpropertiesFile != null) {            
+            if (URIpropertiesFile.getScheme().equals("file")) {                
+                return URIpropertiesFile.getSchemeSpecificPart().substring(2).replace('/',File.separatorChar);
+            } else {
+                LOG.error("URI is not properly formated as a file");
+                throw new RuntimeException("URI is not properly formated as a file");
+            }
+        }
+        return "";
+    }
+
+    		
+    
+	/**
      * @return the URI formated properties file location
      */
     public URI getURIpropertiesFile() {

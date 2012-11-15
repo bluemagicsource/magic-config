@@ -2,8 +2,6 @@ package org.bluemagic.config.tag;
 
 import org.bluemagic.config.api.tag.SingleTag;
 
-import org.bluemagic.config.api.tag.SingleTag;
-
 /**
  * Implements the common hashtags found on Twitter
  * For example #RockyRoadIceCream or #test 
