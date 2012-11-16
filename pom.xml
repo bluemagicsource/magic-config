@@ -18,6 +18,10 @@
 	<description>configuration service core functionality</description>
 	<url>https://github.com/bluemagicsource/magic-config</url>
 
+	 <properties>
+     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+     
 	<dependencies>
 
 		<!-- MANDATORY APIs for Agent -->
